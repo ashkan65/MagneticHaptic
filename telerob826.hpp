@@ -17,15 +17,8 @@ class Telerob826{
 		// int ResetTrigger(INodeMap& nodeMap);
 		// int ConfigureTrigger(INodeMap& nodeMap);
 		// Helpful macros for DIOs
-		#define DIO(C)                  ((uint64)1 << (C))                          // convert dio channel number to uint64 bit mask
-		#define DIOMASK(N)              {(uint)(N) & 0xFFFFFF, (uint)((N) >> 24)}   // convert uint64 bit mask to uint[2] array
-		#define DIOSTATE(STATES,CHAN)   ((STATES[CHAN / 24] >> (CHAN % 24)) & 1)    // extract dio channel's boolean state from uint[2] array
-		#define X826(FUNC)   if ((errcode = FUNC) != S826_ERR_OK) { printf("\nERROR: %d\n", errcode); return errcode;}
 		std::vector <voltage> DAVolts = std::vector<voltage>(8,0.00);				//voltage set to send  --> you need to set the channels
 		std::vector <voltage> ADVolts = std::vector<voltage>(8,0.00);				//voltage read from channels --> you need to set the channels
-
-
-
 		std::vector <temperature> CoilsTemp = std::vector<temperature>(8,0.00);
 		std::vector <current> Currents = std::vector<current>(8,0.00);
 

@@ -7,7 +7,6 @@ Telerob826::Telerob826(){
     board      = 0;                        // change this if you want to use other than board number 0
     errcode     = S826_ERR_OK;  
     boardflags  = S826_SystemOpen();        // open 826 driver and find all 826 boards
-    std::cout<<"Here";
     if (boardflags < 0)
         errcode = boardflags;                       // problem during open
     else if ((boardflags & (1 << board)) == 0) {
@@ -31,10 +30,19 @@ Telerob826::~Telerob826(){
     S826_SystemClose();
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// AnalogWrite. 
 
 void Telerob826::SetDacOutput(uint *chan, double *volts){ // DAC for one channel ----> DOTO add a function for vector update!
     errcode = S826_DacDataWrite(board, *chan, (int)(*volts * 0xFFFF / 20) + 0x8000, 0);  // program DAC output and return error code
 };
+
+
+
+
+
+
 
 void Telerob826::GetDacOutput(uint *chan, double *volts){   //Reads the current voltage for a given channel.
     uint range, setpoint;
