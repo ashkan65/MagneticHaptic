@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "telerobcamera.hpp"
+#include "telerob826.hpp"
 #include <unistd.h>
 #include <sstream>
 #include <sys/types.h>
@@ -78,6 +79,23 @@ int SetDacOutput(uint board, uint chan, uint range, double volts)
 
 int main(int argc, char **argv)
 {
+  // double volt = 10.0;
+  // Telerob826 B826;
+  // std::cout<<"here";
+  // B826.SetDacOutput(0, &volt);
+  // B826.GetDacOutput(0, &volt);
+
+
+
+
+
+
+
+
+
+
+
+
     uint board      = 0;                        // change this if you want to use other than board number 0
     int errcode     = S826_ERR_OK;  
     int boardflags  = S826_SystemOpen();        // open 826 driver and find all 826 boards
