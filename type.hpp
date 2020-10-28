@@ -1,7 +1,9 @@
+
 // Use this for type defs!
 #ifndef TYPE_H
 #define TYPE_H
-
+#include "system_config.hpp"
+#include <iostream>
 #include <vector>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
@@ -12,10 +14,10 @@
 typedef double current;
 typedef double voltage;
 typedef double temperature;
-const uint NumCoils = 8;
-typedef Eigen::Matrix<current, NumCoils, 1> CURRENT_V;
-typedef Eigen::Matrix<current, NumCoils, 1> VOLTAGE_V;
-typedef Eigen::Matrix<current, 2*NumCoils, 1> TEMPERATURE_V; //Two sensors per coil
+typedef Eigen::Matrix<current, NUMCOILS, 1> vec_current;
+typedef Eigen::Matrix<voltage, NUMCOILS, 1> vec_voltage;
+typedef Eigen::Matrix<temperature, 2*NUMCOILS, 1> vec_temp_C; //Two sensors per coil ^\circ {C}
+// typedef Eigen::Matrix<int, NumCoils, 1> vec_pin; // 
 
 
 

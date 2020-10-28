@@ -7,6 +7,7 @@ Lots of
 Ver 1.0 by Ashkan Oct-2020		
 *****************************************************/
 #include <chrono>
+#include <iostream>
 #include "826api.h"
 #include "simple826.hpp" //Parent class fot this class 
 #include "type.hpp"
@@ -18,9 +19,9 @@ class GPIO826: public Simple826 {
 		///////////////////////////////////////////// 
 		// There are eight coils attached to the card (coil 0-7)->DAOut(vetor<8>), also there are two thermolcoples per coil (channels 0-15)->ADin(vector<16>)
 		bool status;
-		VOLTAGE_V CoilVolts;				//voltages VECTOR set to send
-		CURRENT_V CoilCurrents;			//currents VECTOR set to send
-		TEMPERATURE_V CoilTemperatures;		//Temps VECTOR measured from coils
+		vec_current _CoilVolts;				//voltages VECTOR set to send
+		vec_voltage _CoilCurrents;			//currents VECTOR set to send
+		vec_temp_C _CoilTemperatures;		//Temps VECTOR measured from coils
 		// Eigen::VectorXi CoilVoltChannels(8);
 		// Eigen::VectorXi CoilTempChannels(16);
 
@@ -31,7 +32,7 @@ class GPIO826: public Simple826 {
 		void Init();	//TODO
 		void SysOn();	//TODO
 		void SysOff();	//TODO
-		void AnalogWrite(VOLTAGE_V Coilcurrnts_);	//Sends the vectors of Currents to the device (This turns the coils on)
+		void AnalogWrite(vec_current  coilcurrents);	//Sends the vectors of Currents to the device (This turns the coils on)
 
 		// // cv::Mat GetCurrentA2D();	//Returns the current frame from the camera (Type : opencv Mat)
 		// // cv::Mat FilterSetup();	//Returns the current frame from the camera (Type : opencv Mat)

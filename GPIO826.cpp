@@ -1,5 +1,17 @@
-#include <iostream>
 #include "GPIO826.hpp"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The const for the board. 
+void GPIO826::AnalogWrite(vec_current coilcurrnts)
+{
+    _CoilCurrents = coilcurrnts;
+    // for ---->it over the coils
+	for(int i = 0; i < NUMCOILS; i++) {
+		// std::cout << typeid(COIL_OUT_MAP[i]).name() << std::endl;
+	  // SetDacOutput(COIL_OUT_MAP[i], &coilcurrnts(i));
+	}
+    // @todo: for shit 
+    // @body: gjhgdkljhgsdlksdgjlksgdjh sdglkj sgd
+
+
+};

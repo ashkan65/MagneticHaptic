@@ -29,6 +29,10 @@ int main(int argc, char **argv)
   B826.GetDacOutput(&channel, &volt2);
   std::cout<<"Check this:     "<<volt2<<std::endl;
 
+Eigen::Matrix2i a; a << 1, 2, 3, 4;
+// std::cout << "Here is the matrix a:\n" << a[0] << std::endl;
+
+
     return 0;
 }
 
