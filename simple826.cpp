@@ -1,9 +1,9 @@
 #include <iostream>
-#include "telerob826.hpp"
+#include "simple826.hpp"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The const for the board. 
-Telerob826::Telerob826(){
+Simple826::Simple826(){
     board      = 0;                        // change this if you want to use other than board number 0
     errcode     = S826_ERR_OK;  
     boardflags  = S826_SystemOpen();        // open 826 driver and find all 826 boards
@@ -26,7 +26,7 @@ Telerob826::Telerob826(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The Dist for the board. 
 
-Telerob826::~Telerob826(){
+Simple826::~Simple826(){
     S826_SystemClose();
 };
 
@@ -34,7 +34,7 @@ Telerob826::~Telerob826(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // AnalogWrite. 
 
-void Telerob826::SetDacOutput(uint *chan, double *volts){ // DAC for one channel ----> DOTO add a function for vector update!
+void Simple826::SetDacOutput(uint *chan, double *volts){ // DAC for one channel ----> DOTO add a function for vector update!
     errcode = S826_DacDataWrite(board, *chan, (int)(*volts * 0xFFFF / 20) + 0x8000, 0);  // program DAC output and return error code
 };
 
@@ -44,7 +44,7 @@ void Telerob826::SetDacOutput(uint *chan, double *volts){ // DAC for one channel
 
 
 
-void Telerob826::GetDacOutput(uint *chan, double *volts){   //Reads the current voltage for a given channel.
+void Simple826::GetDacOutput(uint *chan, double *volts){   //Reads the current voltage for a given channel.
     uint range, setpoint;
     errcode = S826_DacRead(board, *chan, &range, &setpoint, 0);
     *volts = (setpoint - 32767.0) * (20.0 / 65535.0);
@@ -52,11 +52,11 @@ void Telerob826::GetDacOutput(uint *chan, double *volts){   //Reads the current 
 }; 
 
 
-int Telerob826::GetError(){ //return error code 
+int Simple826::GetError(){ //return error code 
     return errcode; 
 };
 
-void Telerob826::PrintError(){ //return error code 
+void Simple826::PrintError(){ //return error code 
     switch (errcode)
     {
         case S826_ERR_OK:           break;

@@ -15,20 +15,35 @@ add_library(
 	)
 
 add_library(
-	telerob826
-	telerob826.cpp
-	telerob826.hpp
+	simple826
+	simple826.cpp
+	simple826.hpp
 	)
+
+
+add_library(
+	GPIO826
+	GPIO826.cpp
+	GPIO826.hpp
+	)
+
+
+
 add_executable(Haptic_demo main.cpp)
 
 INCLUDE_DIRECTORIES("/home/ashkan/sensoray/driver")
-INCLUDE_DIRECTORIES(/home/ashkan/eigen, /usr/local/lib, /usr/include/flycapture)
+INCLUDE_DIRECTORIES("/usr/include/eigen3", /usr/local/lib, /usr/include/flycapture)
 
+
+
+target_link_libraries(simple826 PRIVATE  "/home/ashkan/sensoray/demo/lib826_64.a" m)
 target_link_libraries(telerobcamera PRIVATE  "/usr/lib/libflycapture.so" ${OpenCV_LIBS})
-target_link_libraries(telerob826 PRIVATE  "/home/ashkan/sensoray/demo/lib826_64.a" m)
+
+
+target_link_libraries(GPIO826 PRIVATE  simple826 "/home/ashkan/sensoray/demo/lib826_64.a" m)
 
 # target_link_libraries(pigi PRIVATE "/home/ashkan/Desktop/naghi_C/build/libghazam.a" )
-target_link_libraries(Haptic_demo PRIVATE telerobcamera telerob826 "/usr/lib/libflycapture.so"  ${OpenCV_LIBS} "/home/ashkan/sensoray/demo/lib826_64.a" m)
+target_link_libraries(Haptic_demo PRIVATE telerobcamera GPIO826 simple826 "/usr/lib/libflycapture.so"  ${OpenCV_LIBS} "/home/ashkan/sensoray/demo/lib826_64.a" m)
 
 # target_link_libraries(SystemRun PRIVATE omnimagnet type "/usr/local/lib/libcomedi.a")
 

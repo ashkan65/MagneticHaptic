@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "telerobcamera.hpp"
-#include "telerob826.hpp"
+#include "GPIO826.hpp"
 #include <unistd.h>
 #include <sstream>
 #include <sys/types.h>
@@ -23,11 +23,11 @@ int main(int argc, char **argv)
 {
   double volt = -6.32;
   double volt2;
-  uint b = 0;
-  Telerob826 B826;
-  B826.SetDacOutput(&b, &volt);
-  B826.GetDacOutput(&b, &volt2);
-  std::cout<<"CHeck this:     "<<volt2<<std::endl;
+  uint channel = 0;
+  GPIO826 B826;
+  B826.SetDacOutput(&channel, &volt);
+  B826.GetDacOutput(&channel, &volt2);
+  std::cout<<"Check this:     "<<volt2<<std::endl;
 
     return 0;
 }
