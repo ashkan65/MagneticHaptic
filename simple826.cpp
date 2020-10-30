@@ -7,6 +7,8 @@ Simple826::Simple826(){
     board      = 0;                        // change this if you want to use other than board number 0
     errcode     = S826_ERR_OK;  
     boardflags  = S826_SystemOpen();        // open 826 driver and find all 826 boards
+    
+
     if (boardflags < 0)
         errcode = boardflags;                       // problem during open
     else if ((boardflags & (1 << board)) == 0) {
@@ -19,28 +21,39 @@ Simple826::Simple826(){
         }
     }
     PrintError();
+    
+
+
     // S826_DacRangeWrite(0, 0, S826_DAC_SPAN_10_10, 1);
     for (uint aout = 0; aout < S826_NUM_DAC; aout++) {         // Program safemode analog output condition:
         S826_DacRangeWrite(0, aout, S826_DAC_SPAN_10_10, 1);  //   output range
         S826_DacDataWrite(0, aout, 0, 0);                   //   output voltage
     }
+    PrintError();
+    // for (uint ain = 0; ain < 2*S826_NUM_DAC; ain++)                              //This needs more work!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //     S826_AdcSlotConfigWrite(0, uint slot, ain, // analog input channel number
+    //     uint tsettle, // settling time in microseconds
+    //     uint range // input range code
+    //     );
+    // }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// The Dist for the board. 
+// The dist for the board. 
 
 Simple826::~Simple826(){
     for (uint aout = 0; aout < S826_NUM_DAC; aout++) {         // Program safemode analog output condition:
         S826_DacDataWrite(0, aout, 0, 0);                   //   output voltage
     }
     uint mask = 0;
-    S826_DioOutputWrite(0, mask, 0) // Turning digital pins off. --> This turns the HIGHVOLTAGE aplifiers off. Always use this before exit!!!!!!!
+    S826_DioOutputWrite(0,&mask, 0); // Turning digital pins off. --> This turns the HIGHVOLTAGE aplifiers off. Always use this before exit!!!!!!!
     S826_SystemClose();
 };
 
 
-int Simple826::GetError(){ //return error code 
+
+int Simple826::GetError(){ //return error code   0: No error, 1: there is and error 
     return errcode; 
 };
 
@@ -81,7 +94,7 @@ void Simple826::GetDacOutput(uint *chan, double *volts){   //Reads the current v
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DigitalWrite. 
-// (condition) ? (if_true) : (if_false)
+// (condition) ? (if_true) : (if_false) 
 void Simple826::SetDioOutput(uint *chan, bool *val){        //chan->channel number  val->voltage ==============DIGITALOUT============
     uint mask[] = {uint(pow(2,*chan)), 0};
     *val ? S826_DioOutputWrite(0, mask, 2) : S826_DioOutputWrite(0, mask, 1);

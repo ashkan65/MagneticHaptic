@@ -23,8 +23,8 @@ class Simple826{
 		int boardflags;        // open 826 driver and find all 826 boards
 
 	public:
-		Simple826();
-		~Simple826(); //Explicitly turns all of the pins off. If there are actuators atached to the card keep them
+		Simple826();	// Currently it sets the range for all of the analog channels to -10:10V. Keep the os
+		~Simple826();	//Explicitly turns all of the pins off. If there are actuators atached to the card keep them
 		void SetDacOutput(uint *chan, double *volts);  //chan->channel number  volt->voltage ==============ANALOGOUT============
 		void GetDacOutput(uint *chan, double *volts);  //chan->channel number  volt->voltage !!!! THIS IS NOT A ANALOG READ (this just returns the output current value)----
 		void SetDioOutput(uint *chan, bool *val);	//chan->channel number  val->voltage ==============DIGITALOUT============

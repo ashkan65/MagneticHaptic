@@ -9,10 +9,11 @@ void GPIO826::Init()
 {
 	*_PCoilVolts<< 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 	AnalogWrite(_PCoilVolts);	// Turns the signal channels off --> be sure there is not HIGHVOLT output
-	bool val = true;
-	for(int i = 0; i < NUMCOILS; i++) {
-		SetDioOutput(&COIL_INHIBIT_MAP[i], &val);	//Turns the amplifiers on--> Be sure the signals are zero before turning these on.	
-	}
+	// bool val = true;
+	// for(int i = 0; i < NUMCOILS; i++) {
+	// 	SetDioOutput(&COIL_INHIBIT_MAP[i], &val);	//Turns the amplifiers on--> Be sure the signals are zero before turning these on.	
+	// }
+	SysOn();
 	PrintError();
 };
 void GPIO826::AnalogWrite(vec_voltage * coilvolts)
@@ -23,3 +24,18 @@ void GPIO826::AnalogWrite(vec_voltage * coilvolts)
 	}
 };
 
+void GPIO826::SysOn()
+{
+	
+	for(int i = 0; i < NUMCOILS; i++) {
+		SetDioOutput(&COIL_OUT_MAP[i] , &ON);
+	}
+};
+
+void GPIO826::SysOff()
+{
+	
+	for(int i = 0; i < NUMCOILS; i++) {
+		SetDioOutput(&COIL_OUT_MAP[i] , &OFF);
+	}
+};
