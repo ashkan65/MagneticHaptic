@@ -38,8 +38,6 @@ INCLUDE_DIRECTORIES("/usr/include/eigen3", /usr/local/lib, /usr/include/flycaptu
 
 target_link_libraries(simple826 PRIVATE  "/home/ashkan/sensoray/demo/lib826_64.a" m)
 target_link_libraries(telerobcamera PRIVATE  "/usr/lib/libflycapture.so" ${OpenCV_LIBS})
-
-
 target_link_libraries(GPIO826 PRIVATE  simple826 "/home/ashkan/sensoray/demo/lib826_64.a" m)
 
 # target_link_libraries(pigi PRIVATE "/home/ashkan/Desktop/naghi_C/build/libghazam.a" )

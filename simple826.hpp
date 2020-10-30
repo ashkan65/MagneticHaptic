@@ -3,6 +3,7 @@
 /*****************************************************
 A wrapper for sensoray card (826) to handle the ms updating rate!
 Ver 1.0 by Ashkan Oct-2020		
+In case of confusion please use: https://www.sensoray.com/downloads/man_826_hw_3.0.10.pdf#page=12&zoom=100,108,382
 *****************************************************/
 #include <chrono>
 #include "826api.h"
@@ -23,9 +24,11 @@ class Simple826{
 
 	public:
 		Simple826();
-		~Simple826();
-		void SetDacOutput(uint *chan, double *volts);  //chan->channel number  volt->voltage
+		~Simple826(); //Explicitly turns all of the pins off. If there are actuators atached to the card keep them
+		void SetDacOutput(uint *chan, double *volts);  //chan->channel number  volt->voltage ==============ANALOGOUT============
 		void GetDacOutput(uint *chan, double *volts);  //chan->channel number  volt->voltage !!!! THIS IS NOT A ANALOG READ (this just returns the output current value)----
+		void SetDioOutput(uint *chan, bool *val);	//chan->channel number  val->voltage ==============DIGITALOUT============
+
 		int GetError();  // Retruns error 
 		void PrintError(); //Prints error
 		// cv::Mat GetCurrentD2A();	//Returns the current frame from the camera (Type : opencv Mat)

@@ -3,7 +3,7 @@
 /*****************************************************
 GPIO (Sensoray 826 interface for Mahnetic haptic device)
 This class Inherents from simple826 class (git: https://github.com/ashkan65/SensorayWrapper)
-Lots of 
+ 
 Ver 1.0 by Ashkan Oct-2020		
 *****************************************************/
 #include <chrono>
@@ -11,7 +11,7 @@ Ver 1.0 by Ashkan Oct-2020
 #include "826api.h"
 #include "simple826.hpp" //Parent class fot this class 
 #include "type.hpp"
-#include <thread>  //Might be better to do the threading outside!
+// #include <thread>  //Might be better to do the threading outside!
 
 
 class GPIO826: public Simple826 {
@@ -19,21 +19,24 @@ class GPIO826: public Simple826 {
 		///////////////////////////////////////////// 
 		// There are eight coils attached to the card (coil 0-7)->DAOut(vetor<8>), also there are two thermolcoples per coil (channels 0-15)->ADin(vector<16>)
 		bool status;
-		vec_current _CoilVolts;				//voltages VECTOR set to send
-		vec_voltage _CoilCurrents;			//currents VECTOR set to send
-		vec_temp_C _CoilTemperatures;		//Temps VECTOR measured from coils
+		vec_voltage * _PCoilVolts;				//voltages VECTOR set to send
+		vec_current * _PCoilCurrents;			//currents VECTOR set to send
+		vec_temp_C * _PCoilTemperatures;		//Temps VECTOR measured from coils
 		// Eigen::VectorXi CoilVoltChannels(8);
 		// Eigen::VectorXi CoilTempChannels(16);
-
-
-
+		const int  NUMCOILS = 8;	// How many coils we have!
+		uint COIL_INHIBIT_MAP[8] = {0,1,2,3,4,5,6,7};; //Channel number for inhibit for Amplifiers		
+		//  List of controll pins per coils : 0,1,2,3,4,5,6,7;	//The pin number with the correct order
+		uint COIL_OUT_MAP[8] = {0,1,2,3,4,5,6,7};
+		//  List of Temp pins per coils;	//The pin number with the correct order. Channel A and B for two sensors per coils
+ 		uint  COIL_TEMP_MAP_A[8] = {0,2,4,6,8,10,12,14};
+		uint  COIL_TEMP_MAP_B[8] = {1,3,5,7,9,11,13,15};
 	public:
 		void SetProp(); //TODO
 		void Init();	//TODO
 		void SysOn();	//TODO
 		void SysOff();	//TODO
-		void AnalogWrite(vec_current  coilcurrents);	//Sends the vectors of Currents to the device (This turns the coils on)
-
+		void AnalogWrite(vec_voltage * coilvolts);	//Sends the vectors of Currents to the device (This turns the coils on)
 		// // cv::Mat GetCurrentA2D();	//Returns the current frame from the camera (Type : opencv Mat)
 		// // cv::Mat FilterSetup();	//Returns the current frame from the camera (Type : opencv Mat)
 		// // cv::Mat FilterSignal();

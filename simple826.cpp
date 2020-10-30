@@ -19,7 +19,11 @@ Simple826::Simple826(){
         }
     }
     PrintError();
-    S826_DacRangeWrite(0, 0, S826_DAC_SPAN_10_10, 1);
+    // S826_DacRangeWrite(0, 0, S826_DAC_SPAN_10_10, 1);
+    for (uint aout = 0; aout < S826_NUM_DAC; aout++) {         // Program safemode analog output condition:
+        S826_DacRangeWrite(0, aout, S826_DAC_SPAN_10_10, 1);  //   output range
+        S826_DacDataWrite(0, aout, 0, 0);                   //   output voltage
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,29 +31,13 @@ Simple826::Simple826(){
 // The Dist for the board. 
 
 Simple826::~Simple826(){
+    for (uint aout = 0; aout < S826_NUM_DAC; aout++) {         // Program safemode analog output condition:
+        S826_DacDataWrite(0, aout, 0, 0);                   //   output voltage
+    }
+    uint mask = 0;
+    S826_DioOutputWrite(0, mask, 0) // Turning digital pins off. --> This turns the HIGHVOLTAGE aplifiers off. Always use this before exit!!!!!!!
     S826_SystemClose();
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// AnalogWrite. 
-
-void Simple826::SetDacOutput(uint *chan, double *volts){ // DAC for one channel ----> DOTO add a function for vector update!
-    errcode = S826_DacDataWrite(board, *chan, (int)(*volts * 0xFFFF / 20) + 0x8000, 0);  // program DAC output and return error code
-};
-
-
-
-
-
-
-
-void Simple826::GetDacOutput(uint *chan, double *volts){   //Reads the current voltage for a given channel.
-    uint range, setpoint;
-    errcode = S826_DacRead(board, *chan, &range, &setpoint, 0);
-    *volts = (setpoint - 32767.0) * (20.0 / 65535.0);
-    PrintError(); //Incase of error!!!
-}; 
 
 
 int Simple826::GetError(){ //return error code 
@@ -60,16 +48,41 @@ void Simple826::PrintError(){ //return error code
     switch (errcode)
     {
         case S826_ERR_OK:           break;
-        case S826_ERR_BOARD:        printf("Illegal board number"); break;
-        case S826_ERR_VALUE:        printf("Illegal argument"); break;
-        case S826_ERR_NOTREADY:     printf("Device not ready or timeout"); break;
-        case S826_ERR_CANCELLED:    printf("Wait cancelled"); break;
-        case S826_ERR_DRIVER:       printf("Driver call failed"); break;
-        case S826_ERR_MISSEDTRIG:   printf("Missed adc trigger"); break;
-        case S826_ERR_DUPADDR:      printf("Two boards have same number"); break;S826_SafeWrenWrite(board, 0x02);
-        case S826_ERR_BOARDCLOSED:  printf("Board not open"); break;
-        case S826_ERR_CREATEMUTEX:  printf("Can't create mutex"); break;
-        case S826_ERR_MEMORYMAP:    printf("Can't map board"); break;
-        default:                    printf("Unknown error"); break;
+        case S826_ERR_BOARD:        std::cout<<"Illegal board number"<<std::endl; break;
+        case S826_ERR_VALUE:        std::cout<<"Illegal argument"<<std::endl; break;
+        case S826_ERR_NOTREADY:     std::cout<<"Device not ready or timeout"<<std::endl; break;
+        case S826_ERR_CANCELLED:    std::cout<<"Wait cancelled"<<std::endl; break;
+        case S826_ERR_DRIVER:       std::cout<<"Driver call failed"<<std::endl; break;
+        case S826_ERR_MISSEDTRIG:   std::cout<<"Missed adc trigger"<<std::endl; break;
+        case S826_ERR_DUPADDR:      std::cout<<"Two boards have same number"<<std::endl; break;S826_SafeWrenWrite(board, 0x02);
+        case S826_ERR_BOARDCLOSED:  std::cout<<"Board not open"<<std::endl; break;
+        case S826_ERR_CREATEMUTEX:  std::cout<<"Can't create mutex"<<std::endl; break;
+        case S826_ERR_MEMORYMAP:    std::cout<<"Can't map board"<<std::endl; break;
+        default:                    std::cout<<"Unknown error"<<std::endl; break;
     }
 };
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// AnalogWrite. 
+
+void Simple826::SetDacOutput(uint *chan, double *volts){ // DAC for one channel ----> DOTO add a function for vector update!
+    errcode = S826_DacDataWrite(board, *chan, (int)(*volts * 0xFFFF / 20) + 0x8000, 0);  // program DAC output and return error code
+};
+
+void Simple826::GetDacOutput(uint *chan, double *volts){   //Reads the current voltage for a given channel.
+    uint range, setpoint;
+    errcode = S826_DacRead(board, *chan, &range, &setpoint, 0);
+    *volts = (setpoint - 32767.0) * (20.0 / 65535.0);
+    PrintError(); //Incase of error!!!
+}; 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DigitalWrite. 
+// (condition) ? (if_true) : (if_false)
+void Simple826::SetDioOutput(uint *chan, bool *val){        //chan->channel number  val->voltage ==============DIGITALOUT============
+    uint mask[] = {uint(pow(2,*chan)), 0};
+    *val ? S826_DioOutputWrite(0, mask, 2) : S826_DioOutputWrite(0, mask, 1);
+};   
