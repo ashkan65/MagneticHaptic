@@ -36,6 +36,15 @@ class GPIO826: public Simple826 {
 		void SysOff();									//Turns the inhebits off
 		void AnalogWrite(vec_voltage * coilvolts);	//Sends the vectors of Currents to the device (This turns the coils on)
 		void AnalogRead(vec_temp_C * coiltemps);
+		
+		// These should be somewhere else:
+		void Current2Volt();
+		void GetCurrentTemp();
+		void GetCoilsCurrent();
+		void GetCoilsVoltage();
+		void SetCoilsCurrent();
+		void SetCoilsVoltage();
+
 		// // cv::Mat GetCurrentA2D();	//Returns the current frame from the camera (Type : opencv Mat)
 		// // cv::Mat FilterSetup();	//Returns the current frame from the camera (Type : opencv Mat)
 		// // cv::Mat FilterSignal();

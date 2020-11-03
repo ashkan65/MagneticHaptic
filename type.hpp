@@ -10,14 +10,16 @@
 #include <Eigen/SVD>
 #include <Eigen/Dense>
 #include <Eigen/QR> 
-#define PI  3.1415926535
+#define PI   3.1415926535
+#define PI_2 1.570796327
 typedef double current;
 typedef double voltage;
 typedef double temperature;
+typedef Eigen::Matrix<double, 5, 1> vec_wrench;
 typedef Eigen::Matrix<current, 8, 1> vec_current;
 typedef Eigen::Matrix<voltage, 8, 1> vec_voltage;
 typedef Eigen::Matrix<temperature, 16, 1> vec_temp_C; //Two sensors per coil ^\circ {C}
-// typedef Eigen::Matrix<int, NumCoils, 1> vec_pin; // 
+typedef Eigen::Matrix<double, 5, 8> Mat_actuation; // 
 
 
 

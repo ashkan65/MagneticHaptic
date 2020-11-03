@@ -28,6 +28,13 @@ add_library(
 	)
 
 
+add_library(
+	controller
+	controller.cpp
+	controller.hpp
+	)
+
+
 
 add_executable(Haptic_demo main.cpp)
 
@@ -41,7 +48,7 @@ target_link_libraries(telerobcamera PRIVATE  "/usr/lib/libflycapture.so" ${OpenC
 target_link_libraries(GPIO826 PRIVATE  simple826 "/home/ashkan/sensoray/demo/lib826_64.a" m)
 
 # target_link_libraries(pigi PRIVATE "/home/ashkan/Desktop/naghi_C/build/libghazam.a" )
-target_link_libraries(Haptic_demo PRIVATE telerobcamera GPIO826 simple826 "/usr/lib/libflycapture.so"  ${OpenCV_LIBS} "/home/ashkan/sensoray/demo/lib826_64.a" m)
+target_link_libraries(Haptic_demo PRIVATE telerobcamera GPIO826 simple826 controller "/usr/lib/libflycapture.so"  ${OpenCV_LIBS} "/home/ashkan/sensoray/demo/lib826_64.a" m)
 
 # target_link_libraries(SystemRun PRIVATE omnimagnet type "/usr/local/lib/libcomedi.a")
 

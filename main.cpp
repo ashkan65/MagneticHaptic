@@ -2,6 +2,7 @@
 #include <vector>
 #include "telerobcamera.hpp"
 #include "GPIO826.hpp"
+#include "controller.hpp"
 #include <unistd.h>
 #include <sstream>
 #include <sys/types.h>
