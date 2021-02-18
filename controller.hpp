@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 /* 
-This are the controllers proposed in : 
+These are the controllers proposed in : 
 A. Pourkand and J. J. Abbott, "Magnetic Actuation With Stationary Electromagnets Considering Power and Temperature Constraints," 
 in IEEE Robotics and Automation Letters, vol. 5, no. 4, pp. 6964-6971, Oct. 2020, doi: 10.1109/LRA.2020.3025512.
 
