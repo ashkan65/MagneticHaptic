@@ -9,6 +9,9 @@ add_definitions(-DOSTYPE_linux)
 
 
 add_executable(ROI_tracking live_ROI.cpp)
+add_executable(Threaded_ROI live_ROI_MultiThreaded.cpp)
 
 
 target_link_libraries(ROI_tracking PRIVATE  ${OpenCV_LIBS} m)
+target_link_libraries(Threaded_ROI PRIVATE  ${OpenCV_LIBS} m)
+

@@ -13,6 +13,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/aruco.hpp>
+#include <opencv2/imgproc.hpp>
 #include <chrono>
 #include "common.h"
 #include <stdlib.h>  
@@ -38,7 +39,7 @@ static void sig_handler(int) {
 	done = true;
 }
 //////////////////////////////////////////////////
-// ARUCO stuf
+// ARUCO stuff
 //////////////////////////////////////////////////
 std::vector<int> markerIds;
 std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
@@ -46,13 +47,21 @@ cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameter
 cv::Mat cameraMatrix, distCoeffs;
 std::vector<cv::Vec3d> rvecs, tvecs;
 cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+int TargetSize = 10;
 //////////////////////////////////////////////////
-
+// Timing stuff
+//////////////////////////////////////////////////
+std::chrono::duration<double> diff;
+double FPS;
+//////////////////////////////////////////////////
 
 uint8_t packet[sizeof(frame_t) + IMG_WIDTH * IMG_HEIGHT];
 
 // Main loop
 int main(int argc, char **argv) {
+auto start = std::chrono::system_clock::now();
+auto end = std::chrono::system_clock::now();
+
 
 	mkdir(out_dir, 0755);
 	mkdir(add_dir, 0755);
@@ -124,24 +133,56 @@ int main(int argc, char **argv) {
 	cv::resizeWindow("Display window", 1200,1600);
 	char key =0;
 while(key != 'q') {
+		
+
+
+
+
+
 		////////////////////////////////////////////////////////////////
 		/// Image loop
 		////////////////////////////////////////////////////////////////
+		// sendROI(sock, (struct sockaddr *)&si_server, &roi);
+		// ret = rx_frame(sock, &si_server, &roi, packet);
+		// full_m.copyTo(show_frame);
+		// // show_frame.convertTo(show_frame,CV_8UC3);
+
+		// cv::addWeighted(show_frame, 6.0, show_frame, 6.0, -100, show_frame);
+		// cv::aruco::detectMarkers(show_frame, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+		// //////////////////////////////////////////////////////////////////////////
+		// // Adding the 
+		// std::cout << markerIds.size() << std::endl;
+		// if (markerIds.size() > 0){
+		// std::cout << markerCorners[0][0]  << std::endl;
+		// // cv::aruco::estimatePoseSingleMarkers(markerCorners, TargetSize, cameraMatrix, distCoeffs, rvecs, tvecs);  // DO NOT RUN THIS without calibration.
+		// cv::cvtColor(show_frame,show_frame, cv::COLOR_GRAY2RGB );
+
+		// // Only keep one:
+		// 	cv::aruco::drawDetectedMarkers(show_frame, markerCorners, markerIds);
+		// 	// cv::aruco::drawAxis(show_frame, cameraMatrix, distCoeffs, rvecs, tvecs, 20);
+		// }
+		//////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+// Checking FPS: Only use this to find the latency:
+		start = std::chrono::system_clock::now();
+		for(int i = 0; i < 1000 ; i++) {
 		sendROI(sock, (struct sockaddr *)&si_server, &roi);
 		ret = rx_frame(sock, &si_server, &roi, packet);
 		full_m.copyTo(show_frame);
-		show_frame.convertTo(show_frame,CV_8UC3);
-
 		cv::addWeighted(show_frame, 6.0, show_frame, 6.0, -100, show_frame);
 		cv::aruco::detectMarkers(show_frame, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
-		cv::aruco::drawDetectedMarkers(show_frame, markerCorners, markerIds);
+		} 
+		end = std::chrono::system_clock::now();
+		diff = end - start;
+		FPS = 1000/diff.count();
+		std::cout << FPS << "   (FPS) " << std::endl;
+////////////////////////////////////////////////////
 
-		std::cout << markerIds.size() << std::endl;
-		if (markerIds.size() > 0){
-		std::cout << markerCorners[0][0]  << std::endl;
-		}
-		// cv::addWeighted(show_frame, 1.0, show_frame, 1.0, 0, show_frame);
-		cv::imshow( "Display window", show_frame);
+		// cv::imshow( "Display window", show_frame);
 		key = cv::waitKey(30);
 	}
 	
