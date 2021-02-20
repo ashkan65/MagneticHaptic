@@ -11,6 +11,9 @@
 #include <arpa/inet.h>
 #include <signal.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/aruco.hpp>
+#include <opencv2/imgproc.hpp>
 #include <chrono>
 #include <thread>
 #include <mutex>
@@ -19,6 +22,20 @@
 #include "common.h"
 // We must include the C++ file so that the code is inlined properly
 #include "common.cpp"
+
+//////////////////////////////////////////////////
+// ARUCO stuff
+//////////////////////////////////////////////////
+std::vector<int> markerIds;
+std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
+cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+cv::Mat cameraMatrix, distCoeffs;
+std::vector<cv::Vec3d> rvecs, tvecs;
+cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+int TargetSize = 10;
+
+
+
 
 // ROI sized frames
 #define ROI_FRAME_COUNT		(10000)
@@ -173,7 +190,7 @@ void process(int sock, struct sockaddr *si_server) {
 			/// timing with this uncommented.
 			////////////////////////////////////////////////////////////////
 			// cv::imwrite("dbg_img.png", m);
-
+			cv::aruco::detectMarkers(*m, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
 			////////////////////////////////////////////////////////////////
 			/// Note: This code must complete in about 450uS to maintain
 			/// a frame rate of 1000 FPS. On CPUs with slower single
