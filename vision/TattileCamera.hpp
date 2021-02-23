@@ -50,7 +50,45 @@ There are so many things that can go wrong.
 
 class TattileCamera{
 	private:
+	// ROI Dimensions
+	#define ROI_WIDTH	152
+	#define ROI_HEIGHT	152
+
+	#define L_ROI_WIDTH	 252
+	#define L_ROI_HEIGHT 252
+
+	// Full Image Dimensions
+	#define IMG_WIDTH	4096
+	#define IMG_HEIGHT	3072
+
+	// The port we'll use
+	#define UDP_PORT	2368
+
+	// The magic code  NO IDEA WHY THIS IS HERE! :)
+	#define CAM_MAGIC	(0xCEDAC0DE)
+
+	// The maximum size of the UDP Packets we're sending
+	// IP max len - IP header - UDP header
+	#define MAX_UDP_SIZE	(65535 - 20 - 8)
+
+
 	// Add the IP stuff and roi
+
+	/* Setup signal handler for stopping the program */
+	struct sigaction action;
+	memset(&action, 0, sizeof(struct sigaction));
+	action.sa_flags = 0;
+	action.sa_handler = sig_handler;
+	sigaction(SIGINT, &action, nullptr);
+	sigaction(SIGTERM, &action, nullptr);
+
+
+	// ROI 
+	ROI_t roi;
+	roi.x = 0;
+	roi.y = 0;
+	roi.width = ROI_WIDTH;
+	roi.height = ROI_HEIGHT;
 
 
 	public:
@@ -58,10 +96,12 @@ class TattileCamera{
 		~TattileCamera();
 		// TattileCamera(); Use this to connect to the IP address 
 		int Initial();
+		void SetIP(); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
 		void PrintCameraInfo(FlyCapture2::CameraInfo *pCamInfo);
 		void UpdateFrame(); //Updates the frame
 		void GetCurrentFrame(cv::Mat * frame); //Returns the current frame from the camera (Type : opencv Mat) 
 		cv::Mat GetCurrentFrame();	//Returns the current frame from the camera (Type : opencv Mat)
 		void SetROI(ROI_t * roi);
+		void sig_handler(int);
 };
 #endif // TATTCAM_H
