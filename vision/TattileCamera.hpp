@@ -1,11 +1,12 @@
 #ifndef TATTCAM_H
 #define TATTCAM_H
 /*****************************************************
-common.h  This is the basic funciutons from the company: 
+common.h  This is the basic funciutons from the camer company: 
 
     Uses:
 		common
 		Opencv
+		thread
 Ver 1.0 by Ashkan Feb-2021
 IF you are using the Tattile cameras, please first read the notes attached to the setup!!!!!!!!!!!!!
 There are so many things that can go wrong.  		
@@ -29,10 +30,7 @@ There are so many things that can go wrong.
 #include <sys/select.h>
 #include <arpa/inet.h>
 #include <signal.h>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/aruco.hpp>
-#include <opencv2/imgproc.hpp>
 #include <chrono>
 #include <stdlib.h>  
 #include <string>
@@ -50,17 +48,12 @@ There are so many things that can go wrong.
 
 class TattileCamera{
 	private:
-	// Add the IP stuff and roi
-
-	/* Setup signal handler for stopping the program */
+	uint8_t packet[sizeof(frame_t) + IMG_WIDTH * IMG_HEIGHT];  //packet for the full frame (12 MP)
+	volatile bool done = false;
+	struct sockaddr_in si_server;  //standard struct for socket package
+	int sock, ret;
 	struct sigaction action;
-	memset(&action, 0, sizeof(struct sigaction));
-	action.sa_flags = 0;
-	action.sa_handler = sig_handler;
-	sigaction(SIGINT, &action, nullptr);
-	sigaction(SIGTERM, &action, nullptr);
-
-
+	
 	// ROI 
 	ROI_t roi;
 	roi.x = 0;
@@ -73,14 +66,14 @@ class TattileCamera{
 		TattileCamera();
 		~TattileCamera();
 		// TattileCamera(); Use this to connect to the IP address 
-		int Initial();
-		void SetIP(); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
-		void SetRingBuffer(); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
-		void PrintCameraInfo(FlyCapture2::CameraInfo *pCamInfo);
+		bool Initial();
+		bool SetupIPAddress(); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
+		bool SetRingBuffer(); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
+		void PrintCameraInfo();
 		void UpdateFrame(); //Updates the frame
 		void GetCurrentFrame(cv::Mat * frame); //Returns the current frame from the camera (Type : opencv Mat) 
 		cv::Mat GetCurrentFrame();	//Returns the current frame from the camera (Type : opencv Mat)
-		void SetROI(ROI_t * roi); // This sets the next ROI
+		void SetROI(ROI_t * roi); // This sets the next ROI @todo: make the ROI atomic or mutex!
 		void sig_handler(int);
 };
 #endif // TATTCAM_H
