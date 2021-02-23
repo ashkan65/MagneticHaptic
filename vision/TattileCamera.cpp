@@ -34,14 +34,22 @@ TattileCamera::TattileCamera(){
 TattileCamera::~TattileCamera(){
 // @todo: Be sure to stop the camera, close the port ...
 };
-bool TattileCamera::SetupIPAddress(){
+void TattileCamera::SetupIPAddress(const char *_add){
 	// Set up the address
 	memset(&si_server, 0, sizeof(struct sockaddr_in));
 	si_server.sin_family = AF_INET;
 	si_server.sin_port = htons(UDP_PORT);
-	if (!inet_aton(argv[1], &si_server.sin_addr)) {
-		printf("Unable to look up the server address: %s!\n", argv[1]);
+	if (!inet_aton(_add, &si_server.sin_addr)) {
+		printf("Unable to look up the server address: %s!\n", _add);
 		exit(-1);
+	}
+};
+
+void TattileCamera::Run(){
+	while(cam_switch){
+		sendROI(sock, (struct sockaddr *)&si_server, &roi);
+		ret = rx_frame(sock, &si_server, &roi, packet);
+		
 	}
 };
 int TattileCamera::Initial(){

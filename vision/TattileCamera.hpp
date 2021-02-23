@@ -60,16 +60,18 @@ class TattileCamera{
 	roi.y = 0;
 	roi.width = ROI_WIDTH;
 	roi.height = ROI_HEIGHT;
-
+	// Images and data
+	cv::Mat full_m(ROI_WIDTH, ROI_WIDTH, CV_8UC1, (void *)(packet + sizeof(frame_t)), sizeof(uint8_t) * ROI_WIDTH);
 
 	public:
 		TattileCamera();
 		~TattileCamera();
 		// TattileCamera(); Use this to connect to the IP address 
 		bool Initial();
-		bool SetupIPAddress(); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
-		bool SetRingBuffer(); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
+		void SetupIPAddress(const char *_add); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
+		bool SetConnections(bool cam_switch, ROI_t * roi, bool NewFrame); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
 		void PrintCameraInfo();
+		void Run(); //This runs the camera until you turn the switch off 
 		void UpdateFrame(); //Updates the frame
 		void GetCurrentFrame(cv::Mat * frame); //Returns the current frame from the camera (Type : opencv Mat) 
 		cv::Mat GetCurrentFrame();	//Returns the current frame from the camera (Type : opencv Mat)

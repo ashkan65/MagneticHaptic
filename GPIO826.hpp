@@ -30,8 +30,8 @@ class GPIO826: public Simple826 {
  		uint  COIL_TEMP_MAP_A[8] = {0,2,4,6,8,10,12,14};//  List of Temp pins per coils; Channel A 
 		uint  COIL_TEMP_MAP_B[8] = {1,3,5,7,9,11,13,15};//  List of Temp pins per coils; Channel B
 	public:
-		void SetProp(); //TODO
-		void Init();	//TODO
+		void SetProp(); 								//TODO
+		void Init();									//TODO
 		void SysOn();									//Turns the inhebits on 
 		void SysOff();									//Turns the inhebits off
 		void AnalogWrite(vec_voltage * coilvolts);	//Sends the vectors of Currents to the device (This turns the coils on)
