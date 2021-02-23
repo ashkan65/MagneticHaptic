@@ -50,28 +50,6 @@ There are so many things that can go wrong.
 
 class TattileCamera{
 	private:
-	// ROI Dimensions
-	#define ROI_WIDTH	152
-	#define ROI_HEIGHT	152
-
-	#define L_ROI_WIDTH	 252
-	#define L_ROI_HEIGHT 252
-
-	// Full Image Dimensions
-	#define IMG_WIDTH	4096
-	#define IMG_HEIGHT	3072
-
-	// The port we'll use
-	#define UDP_PORT	2368
-
-	// The magic code  NO IDEA WHY THIS IS HERE! :)
-	#define CAM_MAGIC	(0xCEDAC0DE)
-
-	// The maximum size of the UDP Packets we're sending
-	// IP max len - IP header - UDP header
-	#define MAX_UDP_SIZE	(65535 - 20 - 8)
-
-
 	// Add the IP stuff and roi
 
 	/* Setup signal handler for stopping the program */
@@ -97,11 +75,12 @@ class TattileCamera{
 		// TattileCamera(); Use this to connect to the IP address 
 		int Initial();
 		void SetIP(); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
+		void SetRingBuffer(); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
 		void PrintCameraInfo(FlyCapture2::CameraInfo *pCamInfo);
 		void UpdateFrame(); //Updates the frame
 		void GetCurrentFrame(cv::Mat * frame); //Returns the current frame from the camera (Type : opencv Mat) 
 		cv::Mat GetCurrentFrame();	//Returns the current frame from the camera (Type : opencv Mat)
-		void SetROI(ROI_t * roi);
+		void SetROI(ROI_t * roi); // This sets the next ROI
 		void sig_handler(int);
 };
 #endif // TATTCAM_H
