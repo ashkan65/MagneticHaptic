@@ -7,7 +7,7 @@
 
 
 TattileCamera::TattileCamera(){
-	
+
 	// Setup signal handler for stopping the program 
 	memset(&action, 0, sizeof(struct sigaction));
 	action.sa_flags = 0;
@@ -34,8 +34,15 @@ TattileCamera::TattileCamera(){
 TattileCamera::~TattileCamera(){
 // @todo: Be sure to stop the camera, close the port ...
 };
-bool TattileCamera::SetIP(){
-		// Set up the address
+bool TattileCamera::SetupIPAddress(){
+	// Set up the address
+	memset(&si_server, 0, sizeof(struct sockaddr_in));
+	si_server.sin_family = AF_INET;
+	si_server.sin_port = htons(UDP_PORT);
+	if (!inet_aton(argv[1], &si_server.sin_addr)) {
+		printf("Unable to look up the server address: %s!\n", argv[1]);
+		exit(-1);
+	}
 };
 int TattileCamera::Initial(){
 
