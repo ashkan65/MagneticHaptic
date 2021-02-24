@@ -116,6 +116,8 @@ auto end = std::chrono::system_clock::now();
 
 	cv::Mat full_m(ROI_WIDTH, ROI_WIDTH, CV_8UC1, (void *)(packet + sizeof(frame_t)), sizeof(uint8_t) * ROI_WIDTH);
 	cv::Mat show_frame;
+	cv::Mat EXT_frame;
+
 	roi.x = 2800;
 	roi.y = 1200;
 	roi.x = roi.x - roi.x % 16;
@@ -168,21 +170,21 @@ while(key != 'q') {
 
 
 // Checking FPS: Only use this to find the latency:
-		start = std::chrono::system_clock::now();
-		for(int i = 0; i < 1000 ; i++) {
 		sendROI(sock, (struct sockaddr *)&si_server, &roi);
 		ret = rx_frame(sock, &si_server, &roi, packet);
 		full_m.copyTo(show_frame);
-		cv::addWeighted(show_frame, 6.0, show_frame, 6.0, -100, show_frame);
-		cv::aruco::detectMarkers(show_frame, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+		start = std::chrono::system_clock::now();
+		for(int i = 0; i < 2000 ; i++) {
+		cv::addWeighted(show_frame, 6.0, show_frame, 6.0, -100, EXT_frame);
+		cv::aruco::detectMarkers(EXT_frame, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
 		} 
 		end = std::chrono::system_clock::now();
 		diff = end - start;
-		FPS = 1000/diff.count();
+		FPS = 2000/diff.count();
 		std::cout << FPS << "   (FPS) " << std::endl;
 ////////////////////////////////////////////////////
-
-		// cv::imshow( "Display window", show_frame);
+		cv::aruco::drawDetectedMarkers(EXT_frame, markerCorners, markerIds);
+		cv::imshow( "Display window", EXT_frame);
 		key = cv::waitKey(30);
 	}
 	
