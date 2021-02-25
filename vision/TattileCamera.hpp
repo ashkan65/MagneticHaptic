@@ -1,10 +1,10 @@
 #ifndef TATTCAM_H
 #define TATTCAM_H
 /*****************************************************
-common.h  This is the basic funciutons from the camer company: 
+While you can use GetCurrentFrame to get the frame, to reach ~1000fps you need to define a buffer
+from the outside and pass the pointer. More details on thiss will come later 
 
     Uses:
-		common
 		Opencv
 		thread
 Ver 1.0 by Ashkan Feb-2021
@@ -92,6 +92,7 @@ class TattileCamera{
 		bool * cam_switch;
 		ROI_t roi;
 		const char *IP;
+		short write_loc;
 		// int camera_index;
 	public:
 		inline static std::vector<TattileCamera *> camera_instances;
@@ -100,7 +101,7 @@ class TattileCamera{
 		// TattileCamera(); Use this to connect to the IP address 
 		ROI_t* GetROI_P();
 		void SetupIPAddress(const char *_add); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
-		bool SetConnections(bool cam_switch, ROI_t * roi, bool NewFrame); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
+		bool SetConnections(bool * cam_switch, ROI_t * roi, bool NewFrame); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
 		void PrintCameraInfo();
 		void Run(); //This runs the camera until you turn the switch off 
 		void UpdateFrame(); //Updates the frame

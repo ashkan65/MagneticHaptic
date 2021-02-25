@@ -23,7 +23,7 @@ TattileCamera::TattileCamera(){
 	action.sa_handler = sig_handler2;
 	sigaction(SIGINT, &action, nullptr);
 	sigaction(SIGTERM, &action, nullptr);
-
+	write_loc = 1;
 	// Create the socket for getting data
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock == -1) {
