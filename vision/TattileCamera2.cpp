@@ -10,6 +10,7 @@
 
 TattileCamera::TattileCamera(){
 	// Setting up the ROI: 
+	std::cout<<"Here================"; 
 	roi.x = 0;
 	roi.y = 0;
 	roi.width = ROI_WIDTH;
