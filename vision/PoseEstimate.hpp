@@ -47,11 +47,22 @@ class PoseEstimate{
 	private:
 		short read_loc; // Set this to 2 in the constructor
 		cv::Mat frame;
-		
+		std::vector<int> markerIds;
+		std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
+		cv::Ptr<cv::aruco::DetectorParameters> parameters;
+		cv::Mat cameraMatrix, distCoeffs;
+		std::vector<cv::Vec3d> rvecs, tvecs;
+		cv::Ptr<cv::aruco::Dictionary> dictionary;
+		int MarkerSize;
+		char key;
 	public:
 		PoseEstimate();
 		~PoseEstimate();
-		ShowFrame();
-
+		void ShowFrame(const char *_add);
+		void ShowFrame(cv::Mat & _frame, const char *_add);
+		void ThroughMirror(bool _mirror);
+		void SetMarkerSize(int _size);
+		bool SetConnections(bool * cam_switch, short &roi_x, short &roi_y, bool NewFrame);
+		bool SetCameraCalibration();
 };
 #endif // POSEEST_H

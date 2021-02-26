@@ -15,7 +15,7 @@ TattileCamera::TattileCamera(){
 	roi.width = ROI_WIDTH;
 	roi.height = ROI_HEIGHT;
 	// done[_camera_index] = false;
-	// TattileCamera::camera_instances.push_back(this);
+	TattileCamera::camera_instances.push_back(this);
 	// Setup signal handler for stopping the program 
 	memset(&action, 0, sizeof(struct sigaction));
 	action.sa_flags = 0;
