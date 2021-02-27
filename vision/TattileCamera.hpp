@@ -101,7 +101,7 @@ class TattileCamera{
 		// TattileCamera(); Use this to connect to the IP address 
 		ROI_t* GetROI_P();
 		void SetupIPAddress(const char *_add); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
-		bool SetConnections(bool * cam_switch, ROI_t * roi, bool NewFrame); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
+		bool SetConnections(cv::Mat (&buffer)[3], std::atomic<bool> &NewFrame , std::atomic<short> &available_index, bool &cam_switch, std::atomic<int> (&ROI)[2]); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
 		void PrintCameraInfo();
 		void Run(); //This runs the camera until you turn the switch off 
 		void UpdateFrame(); //Updates the frame

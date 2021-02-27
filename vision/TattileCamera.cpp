@@ -84,6 +84,9 @@ void TattileCamera::SetROI(ROI_t * roi){
 
 };
 
+bool TattileCamera::SetConnections(cv::Mat (&buffer)[3], std::atomic<bool> &NewFrame , std::atomic<short> &available_index, bool &cam_switch, std::atomic<int> (&ROI)[2]){
+
+};
 
 // Send an ROI command
 void TattileCamera::sendROI(const int sock, const struct sockaddr *sa, volatile ROI_t *roi)  {

@@ -20,8 +20,8 @@ void PoseEstimate::ShowFrame(const char *_add){
 };
 
 void PoseEstimate::ShowFrame(cv::Mat & _frame, const char *_name){
-	cv::imshow( _name, _frame);
-	key = cv::waitKey(30);
+		cv::imshow(_name, _frame);
+		key = cv::waitKey(30);
 };
 
 void PoseEstimate::ThroughMirror(bool _mirror){
