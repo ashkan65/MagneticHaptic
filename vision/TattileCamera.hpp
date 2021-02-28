@@ -1,6 +1,20 @@
 #ifndef TATTCAM_H
 #define TATTCAM_H
 /*****************************************************
+This is a modified version of Tattile camera code that the company provided.
+To keep the FPS high we are using a buffer ring of 3. There is shared cv::mat [3] buffer which bosh camera and pose estimator use to pass data
+
+Shared variables between caemra and pose estimate:
+
+|--------|--------|--------|
+| cv:Mat | cv:Mat | cv:Mat |  cv::Mat Buffer [3]
+|--------|--------|--------|
+
+							  short avaiable  Is there any new frame available for the pose estimator for. 
+							  bool switch --> cam_switch and estimate_switch are both pointing at the sate location
+							  bool Avaiable_frame 
+							  short ROI[2]   The u,v of the corner of the ROI. The camera uses ROI_t struct but we only pass the [u,v] and later copy it to a locaol ROI_t
+
 While you can use GetCurrentFrame to get the frame, to reach ~1000fps you need to define a buffer
 from the outside and pass the pointer. More details on thiss will come later 
 
@@ -84,30 +98,35 @@ typedef struct {
 
 class TattileCamera{
 	private:
-		uint8_t packet[sizeof(frame_t) + ROI_WIDTH * ROI_HEIGHT];  //packet for the full frame (12 MP)
-		volatile bool done = false;
-		struct sockaddr_in si_server;  //standard struct for socket package
-		int sock, ret;
-		struct sigaction action;
-		bool * cam_switch;
-		ROI_t roi;
-		const char *IP;
-		short write_loc;
-		// int camera_index;
+		/////////////////////////////////////////////////////////
+		// Camera server related variables  (UDP- TCP socket to the servern in the camera):
+		uint8_t packet[sizeof(frame_t) + ROI_WIDTH * ROI_HEIGHT];  //packet for the ROI frame (150 X 150)
+		volatile bool done = false;		// another unclear cariable form the camera lib
+		struct sockaddr_in si_server;	//standard struct for socket package
+		int sock, ret;					// The socket to the camera (Tattile is basically a UDP cient that brodcasts the frames as a packet) 
+		struct sigaction action;		// This is due to the bad codding from the camera company --> deal with it!
+		ROI_t roi;						// ROI is a struct from camera company. To keep the atomic variables simple, we pass ints as roi.x and roi.y and then update the ROI
+		const char *IP;					// IP to the camera. You can find the camera IP on router page (probably 192.168.1.1  admin ;)
+		/////////////////////////////////////////////////////////
+		// Camera output and control related variables:		
+		short write_loc;				 
+		cv::Mat* buffer;				// A pointer to an array of 3 cv::mat roi (150X150)
+		std::atomic<bool>* new_frame;	// Where on the buffer the camera should write the next frame
+		std::atomic<short>* available_index;// Where on the buffer are you writing the current frame
+		bool* cam_switch;				// This is the bainary switch that stops the camera. Turn it off and on from the outside. 
+		std::atomic<int>* ROI;			// A pointer to int[2] with u,v of the corner of the roi's location. 
+		cv::Mat camera_roi;				// The arrived roi --> everytime we copy it to the buffer location before updating the next frame. 
 	public:
 		inline static std::vector<TattileCamera *> camera_instances;
 		TattileCamera();
 		~TattileCamera();
-		// TattileCamera(); Use this to connect to the IP address 
 		ROI_t* GetROI_P();
 		void SetupIPAddress(const char *_add); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
-		bool SetConnections(cv::Mat (&buffer)[3], std::atomic<bool> &NewFrame , std::atomic<short> &available_index, bool &cam_switch, std::atomic<int> (&ROI)[2]); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
-		void PrintCameraInfo();
+		bool SetConnections(cv::Mat * _buffer, std::atomic<bool>* _new_frame , std::atomic<short>* _available_index, bool* _cam_switch, std::atomic<int>* _ROI); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
+		void PrintCameraInfo(); // Do this later : Not sure what to print yet :D
 		void Run(); //This runs the camera until you turn the switch off 
-		void UpdateFrame(); //Updates the frame
 		void GetCurrentFrame(cv::Mat * frame); //Returns the current frame from the camera (Type : opencv Mat) 
 		cv::Mat GetCurrentFrame();	//Returns the current frame from the camera (Type : opencv Mat)
-		void SetROI(ROI_t * roi); // This sets the next ROI @todo: make the ROI atomic or mutex!
 		void sendROI(const int sock, const struct sockaddr *sa, volatile ROI_t *roi); // Sending ROI to the caemera
 		void sendStop(int sock, struct sockaddr *sa);
 		bool rx_frame(const int sock, const struct sockaddr_in *si_server, volatile ROI_t *roi, uint8_t *buffer);

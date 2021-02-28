@@ -15,10 +15,8 @@ cv::Mat cam1_Buffer[3];
 
 int main() {
 	int a;
-
 	PoseEstimate Pose_1;
 	cv::Mat inputImage = cv::imread	("full_img.png");
-
 	TattileCamera Cam1;
 	Cam1.SetConnections(cam1_Buffer, cam1_NewFrame , cam1_available_index, cam1_switch, ROI);
 	// Pose
