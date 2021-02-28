@@ -38,11 +38,29 @@ TattileCamera::TattileCamera(){
 		printf("Unable to set the rx buffer size\n");
 		exit(-1);
 	}
+	// Seting up the buffer and pre alocating the memory for NUM_BUFs frames and rois. 
+	// Not the best structure and names which is due to the camera libs
 
+	for (i=0; i<NUM_BUF; i++) {
+		packet = packetBuf[i];
+		// Pre-allocate the cv::Mat for ROI sized images
+		frame_buffer[i] = new cv::Mat(ROI_HEIGHT, ROI_WIDTH, CV_8UC1, (void *)(packet + sizeof(frame_t)), sizeof(uint8_t) * ROI_WIDTH);
+		img[i].m = frame_buffer[i];
+		img[i].roi.x = 0;
+		img[i].roi.y = 0;
+		img[i].roi.width = ROI_WIDTH;
+		img[i].roi.height = ROI_HEIGHT;
+
+	}
 };
 TattileCamera::~TattileCamera(){
 	sendStop(sock, (struct sockaddr *)&si_server);
 	std::cout<< "Camera "<< *IP<< std::endl;
+	for (i=0; i<NUM_BUF; i++) {
+		// delete(ff_m[i]);
+		delete(frame_buffer[i]);
+	}
+
 };
 void TattileCamera::SetupIPAddress(const char *_add){
 	IP = _add;
@@ -59,35 +77,34 @@ void TattileCamera::SetupIPAddress(const char *_add){
 void TattileCamera::Run(){
 	// Switch is a bool pointer that truns on and off from outside of the code. 
 	while(*cam_switch){
-		sendROI(sock, (struct sockaddr *)&si_server, &roi);
-		ret = rx_frame(sock, &si_server, &roi, packet);
+
+		img[write_index].roi.x = ROI->x;
+		img[write_index].roi.y = ROI->y;
+		packet = (uint8_t *)(packetBuf[write_index]);
+		sendROI(sock, si_server, &(img[write_index].roi));
+		ret = rx_frame(sock, &si_server, &(img[write_index].roi), packet);
 		
 	}
 };
 ROI_t* TattileCamera::GetROI_P(){
-	return &roi;
+	return &(img[write_index].roi);
 
 };
-// void TattileCamera::PrintCameraInfo(FlyCapture2::CameraInfo *pCamInfo){
 
-// };
-void TattileCamera::UpdateFrame(){
-
-}; //Updates the frame
+// For 1000fps do not use GetCurrentFrame functions. insetead read them from the buffer. --> check the TattileCamera.hpp file 
 void TattileCamera::GetCurrentFrame(cv::Mat * frame){
-
+	frame  = frame_buffer[write_index];
 }; //Returns the current frame from the camera (Type : opencv Mat) 
 cv::Mat TattileCamera::GetCurrentFrame(){
-
+	return (*frame_buffer[write_index])
 };	//Returns the current frame from the camera (Type : opencv Mat)
-void TattileCamera::SetROI(ROI_t * roi){
 
-};
 
-bool TattileCamera::SetConnections(cv::Mat (&_buffer)[3], std::atomic<bool> &_new_frame , std::atomic<short> &available_index, bool &_cam_switch, std::atomic<int> (&ROI)[2]){
+bool TattileCamera::SetConnections(std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* _cam_switch , std::atomic<ROI_t>* _ROI){
 	cam_switch = _cam_switch;
-	buffer = _buffer;
+	ROI = _ROI;
 	new_frame = _new_frame;
+	available_index = _available_index;
 };
 
 // Send an ROI command
