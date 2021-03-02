@@ -17,7 +17,7 @@ PoseEstimate::~PoseEstimate(){
 
 void PoseEstimate::ShowFrame(const char *_name){
 		
-		cv::imshow(_name, _frame);
+		cv::imshow(_name, frame);
 		key = cv::waitKey(30);
 };
 

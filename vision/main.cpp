@@ -9,7 +9,11 @@ bool cam1_switch = true;
 ROI_t cam1_roi;
 std::atomic<short> cam1_available_index (0);
 std::atomic<bool> cam1_NewFrame (false);
-std::atomic<int> ROI[2] = {};
+std::atomic<bool> cam1_NewROI (true);
+ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 1000,1000};
+
+
+
 // std::atomic<int> &ThreadsCounter
 cv::Mat cam1_Buffer[3];
 
@@ -18,10 +22,14 @@ int main() {
 	PoseEstimate Pose_1;
 	cv::Mat inputImage = cv::imread	("full_img.png");
 	TattileCamera Cam1;
-	Cam1.SetConnections(cam1_Buffer, cam1_NewFrame , cam1_available_index, cam1_switch, ROI);
-	// Pose
+	Cam1.SetupIPAddress("192.168.1.6");
+	Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
+	std::cout<<"HERE-----------------------------------"<<std::endl;
+
+	// Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
 	// Cam1.SetupIPAddress("192.168.1.6");
-	Pose_1.ShowFrame(inputImage, "This name----");
+	Cam1.Run();	
+	// Pose_1.ShowFrame(inputImage, "This name----");
 	return 0;
 }
 

@@ -9,12 +9,8 @@
 // extern void sig_handler(int) {done[1] = true;}
 
 TattileCamera::TattileCamera(){
-	// Setting up the ROI: 
-	roi.x = 0;
-	roi.y = 0;
-	roi.width = ROI_WIDTH;
-	roi.height = ROI_HEIGHT;
-	// done[_camera_index] = false;
+
+
 	TattileCamera::camera_instances.push_back(this);
 	// Setup signal handler for stopping the program 
 	memset(&action, 0, sizeof(struct sigaction));
@@ -23,8 +19,8 @@ TattileCamera::TattileCamera(){
 	action.sa_handler = sig_handler2;
 	sigaction(SIGINT, &action, nullptr);
 	sigaction(SIGTERM, &action, nullptr);
-	write_loc = 1;
-	// Create the socket for getting data
+	write_index = 1;
+	// Create the socket descriptor for getting data
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock == -1) {
 		printf("Unable to open the socket!\n");
@@ -41,7 +37,7 @@ TattileCamera::TattileCamera(){
 	// Seting up the buffer and pre alocating the memory for NUM_BUFs frames and rois. 
 	// Not the best structure and names which is due to the camera libs
 
-	for (i=0; i<NUM_BUF; i++) {
+	for (int i=0; i<NUM_BUF; i++) {
 		packet = packetBuf[i];
 		// Pre-allocate the cv::Mat for ROI sized images
 		frame_buffer[i] = new cv::Mat(ROI_HEIGHT, ROI_WIDTH, CV_8UC1, (void *)(packet + sizeof(frame_t)), sizeof(uint8_t) * ROI_WIDTH);
@@ -52,11 +48,13 @@ TattileCamera::TattileCamera(){
 		img[i].roi.height = ROI_HEIGHT;
 
 	}
+
+
 };
 TattileCamera::~TattileCamera(){
 	sendStop(sock, (struct sockaddr *)&si_server);
 	std::cout<< "Camera "<< *IP<< std::endl;
-	for (i=0; i<NUM_BUF; i++) {
+	for (int i=0; i<NUM_BUF; i++) {
 		// delete(ff_m[i]);
 		delete(frame_buffer[i]);
 	}
@@ -76,17 +74,18 @@ void TattileCamera::SetupIPAddress(const char *_add){
 
 void TattileCamera::Run(){
 	// Switch is a bool pointer that truns on and off from outside of the code. 
-	while(*cam_switch){
+	// while(*cam_switch){
+	for(int i = 1; i<2000;i++){			// Gets 2000 frames 
+		swap_index = (*available_index);
 
 		img[write_index].roi.x = ROI->x;
 		img[write_index].roi.y = ROI->y;
 		packet = (uint8_t *)(packetBuf[write_index]);
-		sendROI(sock, si_server, &(img[write_index].roi));
-		ret = rx_frame(sock, &si_server, &(img[write_index].roi), packet);
-		
+		sendROI( sock, (struct sockaddr *)&si_server, &(img[write_index].roi));
+		ret = rx_frame(sock, &si_server, &(img[write_index].roi), packet);	
 	}
 };
-ROI_t* TattileCamera::GetROI_P(){
+volatile ROI_t* TattileCamera::GetROI_P(){
 	return &(img[write_index].roi);
 
 };
@@ -96,11 +95,11 @@ void TattileCamera::GetCurrentFrame(cv::Mat * frame){
 	frame  = frame_buffer[write_index];
 }; //Returns the current frame from the camera (Type : opencv Mat) 
 cv::Mat TattileCamera::GetCurrentFrame(){
-	return (*frame_buffer[write_index])
+	return (*frame_buffer[write_index]);
 };	//Returns the current frame from the camera (Type : opencv Mat)
 
 
-bool TattileCamera::SetConnections(std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* _cam_switch , std::atomic<ROI_t>* _ROI){
+bool TattileCamera::SetConnections(std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* _cam_switch , std::atomic<bool>* _new_ROI, ROI_t* _ROI){
 	cam_switch = _cam_switch;
 	ROI = _ROI;
 	new_frame = _new_frame;
@@ -125,7 +124,7 @@ void TattileCamera::sendROI(const int sock, const struct sockaddr *sa, volatile 
 	} else if (status != sizeof(frame_t)) {
 		printf("Unable to send full frame_t: %zd bytes of %zu\n", status, sizeof(frame_t));
 	}
-}
+};
 
 // Send a stop command
 void TattileCamera::sendStop(int sock, struct sockaddr *sa)  {
@@ -142,7 +141,7 @@ void TattileCamera::sendStop(int sock, struct sockaddr *sa)  {
 	} else if (status != sizeof(frame_t)) {
 		printf("Unable to send full frame_t: %zd bytes of %zu\n", status, sizeof(frame_t));
 	}
-}
+};
 
 // Receive function
 bool TattileCamera::rx_frame(const int sock, const struct sockaddr_in *si_server, volatile ROI_t *roi, uint8_t *buffer)  {
@@ -205,7 +204,7 @@ bool TattileCamera::rx_frame(const int sock, const struct sockaddr_in *si_server
 		}
 	}
 	return true;
-}
+};
 
 void TattileCamera::sig_handler2 (int) // calls the handlers
 {
@@ -213,4 +212,4 @@ void TattileCamera::sig_handler2 (int) // calls the handlers
 		camera_instances[i]->done = true;
 	}
 	// this->done = true;
-}
+};

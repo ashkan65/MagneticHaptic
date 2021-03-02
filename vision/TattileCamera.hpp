@@ -115,19 +115,19 @@ class TattileCamera{
 		struct sockaddr_in si_server;	//standard struct for socket package
 		int sock, ret;					// The socket to the camera (Tattile is basically a UDP cient that brodcasts the frames as a packet) 
 		struct sigaction action;		// This is due to the bad codding from the camera company --> deal with it!
-		ROI_t roi;						// ROI is a struct from camera company. To keep the atomic variables simple, we pass ints as roi.x and roi.y and then update the ROI
+		// ROI_t roi;						// ROI is a struct from camera company. To keep the atomic variables simple, we pass ints as roi.x and roi.y and then update the ROI
 		const char *IP;					// IP to the camera. You can find the camera IP on router page (probably 192.168.1.1  admin ;)
 		/////////////////////////////////////////////////////////
 		// Camera output and control related variables:		
-		
-		short write_index;				//Where in the buffer are you writing. 				 
+		short write_index;				// Where in the buffer are you writing. 				 
+		short swap_index;				// A temp variable to swap write with available. 
 		cv::Mat* buffer;				// A pointer to an array of 3 cv::mat roi (150X150)--> we ended up using roi_m instead. 
 		std::atomic<bool>* new_frame;	// Where on the buffer the camera should write the next frame
 		std::atomic<short>* available_index;// Where on the buffer are you writing the current frame
 		bool* cam_switch;				// This is the bainary switch that stops the camera. Turn it off and on from the outside. 
 		// std::atomic<int>* ROI;			// A pointer to int[2] with u,v of the corner of the roi's location. 
 		cv::Mat camera_roi;				// The arrived roi --> everytime we copy it to the buffer location before updating the next frame. 
-		std::atomic<ROI_t>* ROI		// !!!! init it in setcinnections A pointer to requested roi. fill this from the pose estiamte or main --> add Kalman filter to improve the performance.
+		ROI_t* ROI;		// !!!! init it in setcinnections A pointer to requested roi. fill this from the pose estiamte or main --> add Kalman filter to improve the performance.
 		/////////////////////////////////////////////////////////
 		// The flow of the data is as follow: 
 		// Firrst in constructore:
@@ -142,21 +142,22 @@ class TattileCamera{
 		// We send the roi to the camera
 		//
 		cv::Mat *frame_buffer[NUM_BUF];	// Buffer of rois 
-		uint8_t packetBuf[NUM_BUF][sizeof(frame_t) + IMG_WIDTH * IMG_HEIGHT]; // Allocate packet buffers (max size for packet)
+		uint8_t packetBuf[NUM_BUF][sizeof(frame_t) + ROI_WIDTH * ROI_HEIGHT]; // Allocate packet buffers (max size for packet)
+		uint8_t *packet = NULL;
 		RoiImg_t img[NUM_BUF];			// The buffer of ROIImg_ts with cv::mat pointers to frame_buffer. 
 
 	public:
 		inline static std::vector<TattileCamera *> camera_instances;
 		TattileCamera();
 		~TattileCamera();
-		ROI_t* GetROI_P();
+		volatile ROI_t* GetROI_P();
 		void SetupIPAddress(const char *_add); // Sets the camera's IP address. You can find this form your router page (probably: 192.168.1.1--> pass : admin)
-		bool SetConnections( std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* _cam_switch , std::atomic<ROI_t>* _ROI); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
+		bool SetConnections( std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* _cam_switch , std::atomic<bool>* _new_ROI, ROI_t* _ROI); //This is a 3 cell ring buffer with overwrite option (wont wait for the vision code)
 		void PrintCameraInfo();			// Do this later : Not sure what to print yet :D
 		void Run();						//This runs the camera until you turn the switch off 
 		void GetCurrentFrame(cv::Mat * frame); //Returns the current frame from the camera (Type : opencv Mat) 
 		cv::Mat GetCurrentFrame();		//Returns the current frame from the camera (Type : opencv Mat)
-		void sendROI(const int sock, const struct sockaddr *sa, volatile ROI_t *roi); // Sending ROI to the caemera
+		void sendROI(const int _sock, const struct sockaddr *sa, volatile ROI_t *roi); // Sending ROI to the caemera
 		void sendStop(int sock, struct sockaddr *sa);
 		bool rx_frame(const int sock, const struct sockaddr_in *si_server, volatile ROI_t *roi, uint8_t *buffer);
 		static void sig_handler2 (int);
