@@ -43,10 +43,23 @@ There are so many things that can go wrong.
 #include <string.h>
 #include <errno.h>
 
+
 class PoseEstimate{
 	private:
-		short read_loc; // Set this to 2 in the constructor
-		cv::Mat frame;
+		//////////////////////////////////////////////////////
+		// Buffer
+		//////////////////////////////////////////////////////
+		short read_index;				// Where in the buffer are you writing. 				 
+		short swap_index;				// A temp variable to swap write with available. 
+		cv::Mat** buffer;
+		std::atomic<bool>* new_frame;
+		std::atomic<short>* available_index;
+		bool* vision_switch;			// This points to a camera switch.
+		std::atomic<bool>* new_ROI;
+		int* ROI;
+		//////////////////////////////////////////////////////
+		// Aruco 
+		//////////////////////////////////////////////////////
 		std::vector<int> markerIds;
 		std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
 		cv::Ptr<cv::aruco::DetectorParameters> parameters;
@@ -55,6 +68,7 @@ class PoseEstimate{
 		cv::Ptr<cv::aruco::Dictionary> dictionary;
 		int MarkerSize;
 		char key;
+		//////////////////////////////////////////////////////
 	public:
 		PoseEstimate();
 		~PoseEstimate();
@@ -62,7 +76,9 @@ class PoseEstimate{
 		void ShowFrame(cv::Mat & _frame, const char *_add);
 		void ThroughMirror(bool _mirror);
 		void SetMarkerSize(int _size);
-		bool SetConnections(bool * cam_switch, short &roi_x, short &roi_y, bool NewFrame);
+		void SetBuffer(cv::Mat**_buffer);  // This is a pointer to buffer size 3
+		bool SetConnections( std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* vision_switch , std::atomic<bool>* _new_ROI, int* _ROI); //This is a 3 cell ring buffer with overwrite option.	
+		void Run();
 		bool SetCameraCalibration();
 };
 #endif // POSEEST_H

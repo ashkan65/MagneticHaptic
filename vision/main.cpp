@@ -19,16 +19,20 @@ cv::Mat cam1_Buffer[3];
 
 int main() {
 	int a;
-	PoseEstimate Pose_1;
+	PoseEstimate Pose1;
 	cv::Mat inputImage = cv::imread	("full_img.png");
 	TattileCamera Cam1;
 	Cam1.SetupIPAddress("192.168.1.6");
 	Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
 	std::cout<<"HERE-----------------------------------"<<std::endl;
-
+	Pose1.SetBuffer(Cam1.GetBuffer());
 	// Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
 	// Cam1.SetupIPAddress("192.168.1.6");
-	Cam1.Run();	
+	// Cam1.Run();	
+	// std::thread t1(Cam1.Run());
+	// std::thread t2(Pose1.Run());
+	// t1.join();
+	// t2.join();
 	// Pose_1.ShowFrame(inputImage, "This name----");
 	return 0;
 }

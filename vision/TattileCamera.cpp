@@ -10,7 +10,6 @@
 
 TattileCamera::TattileCamera(){
 
-
 	TattileCamera::camera_instances.push_back(this);
 	// Setup signal handler for stopping the program 
 	memset(&action, 0, sizeof(struct sigaction));
@@ -46,10 +45,7 @@ TattileCamera::TattileCamera(){
 		img[i].roi.y = 0;
 		img[i].roi.width = ROI_WIDTH;
 		img[i].roi.height = ROI_HEIGHT;
-
 	}
-
-
 };
 TattileCamera::~TattileCamera(){
 	sendStop(sock, (struct sockaddr *)&si_server);
@@ -76,18 +72,24 @@ void TattileCamera::Run(){
 	// Switch is a bool pointer that truns on and off from outside of the code. 
 	// while(*cam_switch){
 	for(int i = 1; i<2000;i++){			// Gets 2000 frames 
-		swap_index = (*available_index);
-
+		// Swapping the available index and writing index:
+		swap_index = *available_index;
+		*available_index = write_index;
+		write_index = swap_index;
+		std::cout<<write_index<<std::endl;
+		// Updating the ROI x and y in the correct index
 		img[write_index].roi.x = ROI->x;
 		img[write_index].roi.y = ROI->y;
-		packet = (uint8_t *)(packetBuf[write_index]);
-		sendROI( sock, (struct sockaddr *)&si_server, &(img[write_index].roi));
-		ret = rx_frame(sock, &si_server, &(img[write_index].roi), packet);	
+		packet = (uint8_t *)(packetBuf[write_index]);								// Updating the packet to point at the correct buffer cell
+		sendROI( sock, (struct sockaddr *)&si_server, &(img[write_index].roi));		// Sendign the ROI to the camera
+		ret = rx_frame(sock, &si_server, &(img[write_index].roi), packet);			// Capturing the incomming frame
+		*new_frame = true;
 	}
+	*cam_switch = false;
+
 };
 volatile ROI_t* TattileCamera::GetROI_P(){
 	return &(img[write_index].roi);
-
 };
 
 // For 1000fps do not use GetCurrentFrame functions. insetead read them from the buffer. --> check the TattileCamera.hpp file 
@@ -115,7 +117,6 @@ void TattileCamera::sendROI(const int sock, const struct sockaddr *sa, volatile 
 	f.roi.y = roi->y;
 	f.roi.width = roi->width;
 	f.roi.height = roi->height;
-
 	// These packets are short and should always fit in the buffer
 	ssize_t status = sendto(sock, &f, sizeof(frame_t), 0, sa, sizeof(struct sockaddr_in));
 	if (status < 0) {
@@ -132,7 +133,6 @@ void TattileCamera::sendStop(int sock, struct sockaddr *sa)  {
 	frame_t f;
 	f.magic = htonl(CAM_MAGIC);
 	memset(&(f.roi), 0, sizeof(ROI_t));
-
 	// These packets are short and should always fit in the buffer
 	ssize_t status = sendto(sock, &f, sizeof(frame_t), 0, sa, sizeof(struct sockaddr_in));
 	if (status < 0) {
@@ -212,4 +212,8 @@ void TattileCamera::sig_handler2 (int) // calls the handlers
 		camera_instances[i]->done = true;
 	}
 	// this->done = true;
+};
+
+cv::Mat** TattileCamera::GetBuffer(){
+	return frame_buffer;
 };

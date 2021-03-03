@@ -58,7 +58,8 @@ There are so many things that can go wrong.
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
+#include <vector>
+#include <atomic> 
 // ROI Dimensions
 #define ROI_WIDTH	152
 #define ROI_HEIGHT	152
@@ -160,6 +161,7 @@ class TattileCamera{
 		void sendROI(const int _sock, const struct sockaddr *sa, volatile ROI_t *roi); // Sending ROI to the caemera
 		void sendStop(int sock, struct sockaddr *sa);
 		bool rx_frame(const int sock, const struct sockaddr_in *si_server, volatile ROI_t *roi, uint8_t *buffer);
+		cv::Mat** GetBuffer();
 		static void sig_handler2 (int);
 
 		// static A * signal_object;
