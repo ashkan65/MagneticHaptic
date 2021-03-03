@@ -64,10 +64,12 @@ class PoseEstimate{
 		std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
 		cv::Ptr<cv::aruco::DetectorParameters> parameters;
 		cv::Mat cameraMatrix, distCoeffs;
+		cv::Mat current_frame;
 		std::vector<cv::Vec3d> rvecs, tvecs;
 		cv::Ptr<cv::aruco::Dictionary> dictionary;
 		int MarkerSize;
 		char key;
+		void Filter();
 		//////////////////////////////////////////////////////
 	public:
 		PoseEstimate();
