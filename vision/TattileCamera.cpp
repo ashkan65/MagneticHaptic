@@ -73,9 +73,9 @@ void TattileCamera::Run(){
 	// while(*cam_switch){
 	for(int i = 1; i<2000;i++){			// Gets 2000 frames 
 		// Swapping the available index and writing index:
-		swap_index = *available_index;
-		*available_index = write_index;
-		write_index = swap_index;
+		swap_index.store((*available_index).load());
+		(*available_index).store(write_index.load());
+		write_index.store(swap_index.load());
 		std::cout<<write_index<<std::endl;
 		// Updating the ROI x and y in the correct index
 		img[write_index].roi.x = ROI->x;

@@ -42,21 +42,23 @@ There are so many things that can go wrong.
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
+#include <atomic>
 
 class PoseEstimate{
 	private:
 		//////////////////////////////////////////////////////
 		// Buffer
 		//////////////////////////////////////////////////////
-		short read_index;				// Where in the buffer are you writing. 				 
-		short swap_index;				// A temp variable to swap write with available. 
+		std::atomic<short> read_index ;				// Where in the buffer are you writing. 				 
+		std::atomic<short> swap_index ;				// A temp variable to swap write with available. 
 		cv::Mat** buffer;
-		std::atomic<bool>* new_frame;
+		std::atomic<bool>* new_frame;				// Pointer to shared atomic to 
 		std::atomic<short>* available_index;
 		bool* vision_switch;			// This points to a camera switch.
 		std::atomic<bool>* new_ROI;
-		int* ROI;
+		uint16_t* ROI_x;
+		uint16_t* ROI_y;
+
 		//////////////////////////////////////////////////////
 		// Aruco 
 		//////////////////////////////////////////////////////
@@ -79,7 +81,7 @@ class PoseEstimate{
 		void ThroughMirror(bool _mirror);
 		void SetMarkerSize(int _size);
 		void SetBuffer(cv::Mat**_buffer);  // This is a pointer to buffer size 3
-		bool SetConnections( std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* vision_switch , std::atomic<bool>* _new_ROI, int* _ROI); //This is a 3 cell ring buffer with overwrite option.	
+		bool SetConnections( std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* vision_switch , std::atomic<bool>* _new_ROI, uint16_t* _ROI_x,uint16_t* _ROI_y); //This is a 3 cell ring buffer with overwrite option.	
 		void Run();
 		bool SetCameraCalibration();
 };

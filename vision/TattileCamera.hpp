@@ -120,8 +120,8 @@ class TattileCamera{
 		const char *IP;					// IP to the camera. You can find the camera IP on router page (probably 192.168.1.1  admin ;)
 		/////////////////////////////////////////////////////////
 		// Camera output and control related variables:		
-		short write_index;				// Where in the buffer are you writing. 				 
-		short swap_index;				// A temp variable to swap write with available. 
+		std::atomic<short> write_index;				// Where in the buffer are you writing. 				 
+		std::atomic<short> swap_index;				// A temp variable to swap write with available. 
 		cv::Mat* buffer;				// A pointer to an array of 3 cv::mat roi (150X150)--> we ended up using roi_m instead. 
 		std::atomic<bool>* new_frame;	// Where on the buffer the camera should write the next frame
 		std::atomic<short>* available_index;// Where on the buffer are you writing the current frame

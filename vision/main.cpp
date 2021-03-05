@@ -5,6 +5,9 @@
 #include <thread>         // std::thread, std::this_thread::yield
 #include <vector>         // std::vector
 #include <chrono>	  // TO add artificial delays. You can remove it.
+#include <atomic>         // std::atomic, std::atomic_flag, ATOMIC_FLAG_INIT
+#include <thread>         // std::thread, std::this_thread::yield
+
 bool cam1_switch = true;  
 ROI_t cam1_roi;
 std::atomic<short> cam1_available_index (0);
@@ -26,13 +29,15 @@ int main() {
 	Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
 	std::cout<<"HERE-----------------------------------"<<std::endl;
 	Pose1.SetBuffer(Cam1.GetBuffer());
+	Pose1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &(ROI.x), &(ROI.y));
+	
 	// Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
 	// Cam1.SetupIPAddress("192.168.1.6");
 	// Cam1.Run();	
-	// std::thread t1(Cam1.Run());
-	// std::thread t2(Pose1.Run());
-	// t1.join();
-	// t2.join();
+	std::thread thread1(&Cam1::Run);
+	std::thread thread2(&Pose1::Run);
+	thread1.join();
+	thread2.join();
 	// Pose_1.ShowFrame(inputImage, "This name----");
 	return 0;
 }
