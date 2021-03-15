@@ -7,13 +7,13 @@
 #include <chrono>	  // TO add artificial delays. You can remove it.
 #include <atomic>         // std::atomic, std::atomic_flag, ATOMIC_FLAG_INIT
 #include <thread>         // std::thread, std::this_thread::yield
-
+#include <functional>	//std::mem_fn
 bool cam1_switch = true;  
 ROI_t cam1_roi;
 std::atomic<short> cam1_available_index (0);
 std::atomic<bool> cam1_NewFrame (false);
 std::atomic<bool> cam1_NewROI (true);
-ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 1000,1000};
+ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 2800,1200};
 
 
 
@@ -34,10 +34,10 @@ int main() {
 	// Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
 	// Cam1.SetupIPAddress("192.168.1.6");
 	// Cam1.Run();	
-	std::thread thread1(&Cam1::Run);
-	std::thread thread2(&Pose1::Run);
-	thread1.join();
-	thread2.join();
+	std::thread thread1(std::mem_fn(&TattileCamera::Run), &Cam1);
+	std::thread thread2(std::mem_fn(&PoseEstimate::Run), &Pose1);
+	thread1.join();	
+	thread2.join();	
 	// Pose_1.ShowFrame(inputImage, "This name----");
 	return 0;
 }

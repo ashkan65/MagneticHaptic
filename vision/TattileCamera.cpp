@@ -18,7 +18,8 @@ TattileCamera::TattileCamera(){
 	action.sa_handler = sig_handler2;
 	sigaction(SIGINT, &action, nullptr);
 	sigaction(SIGTERM, &action, nullptr);
-	write_index = 1;
+	write_index.store (1);
+	swap_index.store (0);
 	// Create the socket descriptor for getting data
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock == -1) {
@@ -71,12 +72,12 @@ void TattileCamera::SetupIPAddress(const char *_add){
 void TattileCamera::Run(){
 	// Switch is a bool pointer that truns on and off from outside of the code. 
 	// while(*cam_switch){
-	for(int i = 1; i<2000;i++){			// Gets 2000 frames 
+	for(int i = 1; i<20000;i++){			// Gets 2000 frames 
 		// Swapping the available index and writing index:
+		// std::cout<<"W: "<<write_index<<" a: "<<*available_index <<std::endl;
 		swap_index.store((*available_index).load());
 		(*available_index).store(write_index.load());
 		write_index.store(swap_index.load());
-		std::cout<<write_index<<std::endl;
 		// Updating the ROI x and y in the correct index
 		img[write_index].roi.x = ROI->x;
 		img[write_index].roi.y = ROI->y;

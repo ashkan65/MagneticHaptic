@@ -53,18 +53,31 @@ void PoseEstimate::SetBuffer(cv::Mat**_buffer){
 }; 
 
 void PoseEstimate::Run(){
+	//////////// FPS calculator:
+	int frame_count;
+	auto start = std::chrono::system_clock::now();
+	auto end = std::chrono::system_clock::now();
+	std::chrono::duration<double> diff;
+	///////
+	start = std::chrono::system_clock::now();
 	while(*vision_switch){
 		if ((*new_frame).load()){
+			// std::cout<<"R: "<<-1*read_index<<"     a: "<<-1**available_index<<std::endl;
 			swap_index.store((*available_index).load());
 			(*available_index).store(read_index.load());
 			read_index.store(swap_index.load());
+
 			// *buffer[read_index]; This is the current frame. To keep things clean do the processing in the filter function 
 			Filter();
-			cv::imshow("Something", *buffer[read_index]);
-			key = cv::waitKey(30);
+			// cv::imshow("Something1", *buffer[read_index]);
+			// key = cv::waitKey(30);
+			frame_count++;
 			(*new_frame).store(false);
 		}
 	}
+	end = std::chrono::system_clock::now();
+	diff = end - start;
+	std::cout<<"FPS:"<<frame_count/diff.count()<<std::endl;
 };
 
 void PoseEstimate::Filter(){
@@ -78,9 +91,12 @@ void PoseEstimate::Filter(){
 		///////////////////////////////////////////////////////////////////////////////////
 		// Use this block to draw detected markers and estimated axis on the curretn frame.
 		///////////////////////////////////////////////////////////////////////////////////
-		// cv::cvtColor(current_frame,current_frame, cv::COLOR_GRAY2RGB );	Ggray2RGB conversion. The current_frame is gray scale and the drawing will become BW
+		cv::cvtColor(current_frame,current_frame, cv::COLOR_GRAY2RGB );	//Ggray2RGB conversion. The current_frame is gray scale and the drawing will become BW
+		// std::cout<<markerCorners[0][0]<<std::endl;
 		//// I would only keep one of these drawings. 
-		// cv::aruco::drawDetectedMarkers(current_frame, markerCorners, markerIds);	Drawing on the detected marker	
+		cv::aruco::drawDetectedMarkers(current_frame, markerCorners, markerIds);	//Drawing on the detected marker	
 		// cv::aruco::drawAxis(show_frame, cameraMatrix, distCoeffs, rvecs, tvecs, 20);
 	}
+	// cv::imshow("Something", current_frame);
+	// key = cv::waitKey(30);
 };
