@@ -72,7 +72,7 @@ void TattileCamera::SetupIPAddress(const char *_add){
 void TattileCamera::Run(){
 	// Switch is a bool pointer that truns on and off from outside of the code. 
 	// while(*cam_switch){
-	for(int i = 1; i<20000;i++){			// Gets 2000 frames 
+	for(int i = 1; i<200000;i++){			// Gets 2000 frames 
 		// Swapping the available index and writing index:
 		// std::cout<<"W: "<<write_index<<" a: "<<*available_index <<std::endl;
 		swap_index.store((*available_index).load());

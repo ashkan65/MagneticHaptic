@@ -69,8 +69,8 @@ void PoseEstimate::Run(){
 
 			// *buffer[read_index]; This is the current frame. To keep things clean do the processing in the filter function 
 			Filter();
-			// cv::imshow("Something1", *buffer[read_index]);
-			// key = cv::waitKey(30);
+			cv::imshow("Something1", *buffer[read_index]);
+			key = cv::waitKey(30);
 			frame_count++;
 			(*new_frame).store(false);
 		}
@@ -94,9 +94,9 @@ void PoseEstimate::Filter(){
 		cv::cvtColor(current_frame,current_frame, cv::COLOR_GRAY2RGB );	//Ggray2RGB conversion. The current_frame is gray scale and the drawing will become BW
 		// std::cout<<markerCorners[0][0]<<std::endl;
 		//// I would only keep one of these drawings. 
-		cv::aruco::drawDetectedMarkers(current_frame, markerCorners, markerIds);	//Drawing on the detected marker	
+		// cv::aruco::drawDetectedMarkers(current_frame, markerCorners, markerIds);	//Drawing on the detected marker	
 		// cv::aruco::drawAxis(show_frame, cameraMatrix, distCoeffs, rvecs, tvecs, 20);
 	}
-	// cv::imshow("Something", current_frame);
-	// key = cv::waitKey(30);
+	cv::imshow("Something", current_frame);
+	key = cv::waitKey(30);
 };
