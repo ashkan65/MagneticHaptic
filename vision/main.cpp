@@ -13,7 +13,7 @@ ROI_t cam1_roi;
 std::atomic<short> cam1_available_index (0);
 std::atomic<bool> cam1_NewFrame (false);
 std::atomic<bool> cam1_NewROI (true);
-ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 2800,1200};
+ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 1200,1200};
 
 
 
@@ -28,6 +28,7 @@ int main() {
 	Cam1.SetupIPAddress("192.168.1.6");
 	Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
 	std::cout<<"HERE-----------------------------------"<<std::endl;
+	Pose1.SetCameraCalibration("../calibration/cam_left.yml");
 	Pose1.SetBuffer(Cam1.GetBuffer());
 	Pose1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &(ROI.x), &(ROI.y));
 	

@@ -44,8 +44,14 @@ bool PoseEstimate::SetConnections( std::atomic<bool>* _new_frame , std::atomic<s
 	new_ROI = _new_ROI;
 };
 
-bool PoseEstimate::SetCameraCalibration(){
+bool PoseEstimate::SetCameraCalibration(std::string calibrationAddress){
+	cv::FileStorage fs2(calibrationAddress, cv::FileStorage::READ);
+	fs2["Camera Matrix"] >> cameraMatrix;
+	fs2["Dist Coeffs"] >> distCoeffs;
+	std::cout<< "Camera Matrix" << cameraMatrix<<std::endl;
+	std::cout<< "Distortion " << distCoeffs<<std::endl;
 
+	fs2.release();
 };
 
 void PoseEstimate::SetBuffer(cv::Mat**_buffer){
@@ -84,19 +90,46 @@ void PoseEstimate::Filter(){
 	// If you are detecting markers through a mirror you have to print the fliped marker
 	// otherwise the code cannot detect them.
 	// *buffer[read_index] // This is the current frame
+	// cv::namedWindow	(	"FullFrame",cv::WINDOW_AUTOSIZE );
 	cv::addWeighted(*buffer[read_index], 6.0, *buffer[read_index], 6.0, -100, current_frame);// Manually increase the ISO
 	cv::aruco::detectMarkers(current_frame, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);  // Detecting Aruco markers
 	if (markerIds.size() > 0){	// Check to see if any marker is been detected
-		// cv::aruco::estimatePoseSingleMarkers(markerCorners, TargetSize, cameraMatrix, distCoeffs, rvecs, tvecs);  // (DO NOT RUN THIS) without calibration.
+		cv::Mat full_frame = cv::Mat::zeros(cv::Size(3072,4096), CV_8U);
+		cv::cvtColor(full_frame,full_frame, cv::COLOR_GRAY2RGB );
+		std::cout<<*ROI_x<<std::endl;
+		// current_frame.copyTo(full_frame(cv::Rect(*ROI_x, *ROI_y,current_frame.cols, current_frame.rows)));
 		///////////////////////////////////////////////////////////////////////////////////
 		// Use this block to draw detected markers and estimated axis on the curretn frame.
 		///////////////////////////////////////////////////////////////////////////////////
+		// Shifting the ditected corners from ROI frame to FULL frame 
+		for (int i= 0; i < markerIds.size(); i++){
+			markerCorners[i][0].x += *ROI_x;
+			markerCorners[i][0].y += *ROI_y;
+			markerCorners[i][1].x += *ROI_x;
+			markerCorners[i][1].y += *ROI_y;
+			markerCorners[i][2].x += *ROI_x;
+			markerCorners[i][2].y += *ROI_y;
+			markerCorners[i][3].x += *ROI_x;
+			markerCorners[i][3].y += *ROI_y;
+		};
+		cv::aruco::estimatePoseSingleMarkers(markerCorners, 1.5, cameraMatrix, distCoeffs, rvecs, tvecs);  // (DO NOT RUN THIS) without calibration.
 		cv::cvtColor(current_frame,current_frame, cv::COLOR_GRAY2RGB );	//Ggray2RGB conversion. The current_frame is gray scale and the drawing will become BW
-		// std::cout<<markerCorners[0][0]<<std::endl;
+		std::cout<<current_frame.type()<<std::endl;
+		std::cout<<full_frame.type()<<std::endl;
+
+		std::cout<<markerCorners[0][0]<<std::endl;
 		//// I would only keep one of these drawings. 
-		// cv::aruco::drawDetectedMarkers(current_frame, markerCorners, markerIds);	//Drawing on the detected marker	
-		// cv::aruco::drawAxis(show_frame, cameraMatrix, distCoeffs, rvecs, tvecs, 20);
+		cv::aruco::drawDetectedMarkers(full_frame, markerCorners, markerIds);	//Drawing on the detected marker	
+		cv::aruco::drawAxis(full_frame, cameraMatrix, distCoeffs, rvecs, tvecs, 10);
+		// cv::resize(full_frame, full_frame, cv::Size(), 0.2, 0.2);
+		cv::namedWindow( "FullFrame", cv::WINDOW_NORMAL );	
+		cv::resizeWindow( "FullFrame" , 600,800 );	
+		cv::imshow( "FullFrame", full_frame);
+
+
 	}
-	cv::imshow("Something", current_frame);
+	cv::imshow("ROI", current_frame);
+	
+
 	key = cv::waitKey(30);
 };

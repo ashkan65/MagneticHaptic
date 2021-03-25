@@ -83,6 +83,6 @@ class PoseEstimate{
 		void SetBuffer(cv::Mat**_buffer);  // This is a pointer to buffer size 3
 		bool SetConnections( std::atomic<bool>* _new_frame , std::atomic<short>* _available_index , bool* vision_switch , std::atomic<bool>* _new_ROI, uint16_t* _ROI_x,uint16_t* _ROI_y); //This is a 3 cell ring buffer with overwrite option.	
 		void Run();
-		bool SetCameraCalibration();
+		bool SetCameraCalibration(std::string calibrationAddress);
 };
 #endif // POSEEST_H
