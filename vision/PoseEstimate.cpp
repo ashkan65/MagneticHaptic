@@ -91,11 +91,16 @@ void PoseEstimate::Filter(){
 	// otherwise the code cannot detect them.
 	// *buffer[read_index] // This is the current frame
 	// cv::namedWindow	(	"FullFrame",cv::WINDOW_AUTOSIZE );
+	cv::Mat ROI_frame;
 	cv::addWeighted(*buffer[read_index], 6.0, *buffer[read_index], 6.0, -100, current_frame);// Manually increase the ISO
 	cv::aruco::detectMarkers(current_frame, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);  // Detecting Aruco markers
+	cv::Mat full_frame = cv::Mat::zeros(cv::Size(4096, 3072), CV_8U);
+	std::cout<<current_frame.type()<<std::endl;
+	std::cout<<full_frame.type()<<std::endl;
+	current_frame.copyTo(full_frame(cv::Rect(*ROI_x, *ROI_y, current_frame.cols, current_frame.rows)));
+	std::cout<<"Here"<<std::endl;
+
 	if (markerIds.size() > 0){	// Check to see if any marker is been detected
-		cv::Mat full_frame = cv::Mat::zeros(cv::Size(3072,4096), CV_8U);
-		cv::cvtColor(full_frame,full_frame, cv::COLOR_GRAY2RGB );
 		std::cout<<*ROI_x<<std::endl;
 		// current_frame.copyTo(full_frame(cv::Rect(*ROI_x, *ROI_y,current_frame.cols, current_frame.rows)));
 		///////////////////////////////////////////////////////////////////////////////////
@@ -114,22 +119,21 @@ void PoseEstimate::Filter(){
 		};
 		cv::aruco::estimatePoseSingleMarkers(markerCorners, 1.5, cameraMatrix, distCoeffs, rvecs, tvecs);  // (DO NOT RUN THIS) without calibration.
 		cv::cvtColor(current_frame,current_frame, cv::COLOR_GRAY2RGB );	//Ggray2RGB conversion. The current_frame is gray scale and the drawing will become BW
-		std::cout<<current_frame.type()<<std::endl;
-		std::cout<<full_frame.type()<<std::endl;
+
 
 		std::cout<<markerCorners[0][0]<<std::endl;
 		//// I would only keep one of these drawings. 
 		cv::aruco::drawDetectedMarkers(full_frame, markerCorners, markerIds);	//Drawing on the detected marker	
-		cv::aruco::drawAxis(full_frame, cameraMatrix, distCoeffs, rvecs, tvecs, 10);
+		cv::cvtColor(full_frame,full_frame, cv::COLOR_GRAY2RGB );
+		cv::aruco::drawAxis(full_frame, cameraMatrix, distCoeffs, rvecs, tvecs, 20);
 		// cv::resize(full_frame, full_frame, cv::Size(), 0.2, 0.2);
-		cv::namedWindow( "FullFrame", cv::WINDOW_NORMAL );	
-		cv::resizeWindow( "FullFrame" , 600,800 );	
-		cv::imshow( "FullFrame", full_frame);
-
-
 	}
+	// cv::namedWindow( "FullFrame", cv::WINDOW_NORMAL );	
+	// cv::resizeWindow( "FullFrame" , 600,800 );
+	cv::imshow("FullFrame", full_frame);
 	cv::imshow("ROI", current_frame);
-	
-
+	if (key =='q'){
+		*vision_switch = false;
+	}
 	key = cv::waitKey(30);
 };
