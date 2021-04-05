@@ -40,7 +40,7 @@ static void sig_handler(int) {
 uint8_t packet[sizeof(frame_t) + IMG_WIDTH * IMG_HEIGHT];
 
 // Main loop
-int main(int argc, char **argv) {
+int main() {
 
 	mkdir(out_dir, 0755);
 	mkdir(add_dir, 0755);
@@ -49,10 +49,7 @@ int main(int argc, char **argv) {
 	int sock, ret;
 	cv::Point min_loc, max_loc;
 
-	if (argc != 2) {
-		printf("Usage:\n\t%s <server to connect to>\n", argv[0]);
-		exit(-1);
-	}
+
 
 	// ROI
 	ROI_t roi;
@@ -88,8 +85,9 @@ int main(int argc, char **argv) {
 	memset(&si_server, 0, sizeof(struct sockaddr_in));
 	si_server.sin_family = AF_INET;
 	si_server.sin_port = htons(UDP_PORT);
-	if (!inet_aton(argv[1], &si_server.sin_addr)) {
-		printf("Unable to look up the server address: %s!\n", argv[1]);
+	char ip[] = "192.168.1.6";
+	if (!inet_aton(ip, &si_server.sin_addr)) {
+		printf("Unable to look up the server address: %s!\n", ip);
 		exit(-1);
 	}
 
@@ -116,7 +114,7 @@ int main(int argc, char **argv) {
 		// 2.1.3.2
 		sendROI(sock, (struct sockaddr *)&si_server, &roi);
 		ret = rx_frame(sock, &si_server, &roi, packet);
-		// cv::imwrite("sweep/dbg_full_img2.png", full_m);
+		cv::imwrite("dbg_full_img2.png", full_m);
 		// show_frame.convertTo(full_m,CV_8UC3);
 		full_m.copyTo(show_frame);
 

@@ -65,9 +65,6 @@ There are so many things that can go wrong.
 #define ROI_WIDTH	152
 #define ROI_HEIGHT	152
 
-#define L_ROI_WIDTH	 252
-#define L_ROI_HEIGHT 252
-
 // Full Image Dimensions
 #define IMG_WIDTH	4096
 #define IMG_HEIGHT	3072
@@ -126,6 +123,7 @@ class TattileCamera{
 		cv::Mat* buffer;				// A pointer to an array of 3 cv::mat roi (150X150)--> we ended up using roi_m instead. 
 		std::atomic<bool>* new_frame;	// Where on the buffer the camera should write the next frame
 		std::atomic<short>* available_index;// Where on the buffer are you writing the current frame
+		cv::Mat* full_frame;
 		bool* cam_switch;				// This is the bainary switch that stops the camera. Turn it off and on from the outside. 
 		// std::atomic<int>* ROI;			// A pointer to int[2] with u,v of the corner of the roi's location. 
 		cv::Mat camera_roi;				// The arrived roi --> everytime we copy it to the buffer location before updating the next frame. 
@@ -144,8 +142,13 @@ class TattileCamera{
 		// We send the roi to the camera
 		//
 		cv::Mat *frame_buffer[NUM_BUF];	// Buffer of rois 
+		// cv::Mat *full_frame = NULL;			// The lastest captured full frame;
 		uint8_t packetBuf[NUM_BUF][sizeof(frame_t) + ROI_WIDTH * ROI_HEIGHT]; // Allocate packet buffers (max size for packet)
+		uint8_t packetROI[sizeof(frame_t) + ROI_WIDTH * ROI_HEIGHT];
+		uint8_t * packet_full_frame = NULL;
+		// uint8_t packetBuffer_full_frame[0][sizeof(frame_t) + IMG_WIDTH * IMG_HEIGHT];
 		uint8_t *packet = NULL;
+		// uint8_t *packet_full_frame = NULL;
 		RoiImg_t img[NUM_BUF];			// The buffer of ROIImg_ts with cv::mat pointers to frame_buffer. 
 
 	public:
@@ -164,7 +167,8 @@ class TattileCamera{
 		bool rx_frame(const int sock, const struct sockaddr_in *si_server, volatile ROI_t *roi, uint8_t *buffer);
 		cv::Mat** GetBuffer();
 		static void sig_handler2 (int);
-
+		// void SwitchToFullFrame();
+		cv::Mat* GetFullFrame();
 		// static A * signal_object;
 };
 #endif // TATTCAM_H

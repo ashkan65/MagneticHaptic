@@ -128,8 +128,8 @@ void PoseEstimate::Filter(){
 		cv::aruco::drawAxis(full_frame, cameraMatrix, distCoeffs, rvecs, tvecs, 20);
 		// cv::resize(full_frame, full_frame, cv::Size(), 0.2, 0.2);
 	}
-	// cv::namedWindow( "FullFrame", cv::WINDOW_NORMAL );	
-	// cv::resizeWindow( "FullFrame" , 600,800 );
+	cv::namedWindow( "FullFrame", cv::WINDOW_NORMAL );	
+	cv::resizeWindow( "FullFrame" , 600,800 );
 	cv::imshow("FullFrame", full_frame);
 	cv::imshow("ROI", current_frame);
 	if (key =='q'){

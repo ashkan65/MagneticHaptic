@@ -47,6 +47,9 @@ TattileCamera::TattileCamera(){
 		img[i].roi.width = ROI_WIDTH;
 		img[i].roi.height = ROI_HEIGHT;
 	}
+	// packet_full_frame = (uint8_t*) malloc (sizeof(frame_t) + IMG_WIDTH * IMG_HEIGHT);
+	// std::fill_n (packet_full_frame,sizeof(frame_t) + IMG_WIDTH * IMG_HEIGHT, 0xFF/2);
+	full_frame =new cv::Mat(ROI_HEIGHT, ROI_WIDTH, CV_8UC1, (void *)(packet + sizeof(frame_t)), sizeof(uint8_t) * ROI_WIDTH);
 };
 TattileCamera::~TattileCamera(){
 	sendStop(sock, (struct sockaddr *)&si_server);
@@ -55,6 +58,7 @@ TattileCamera::~TattileCamera(){
 		// delete(ff_m[i]);
 		delete(frame_buffer[i]);
 	}
+	free(packet_full_frame);
 
 };
 void TattileCamera::SetupIPAddress(const char *_add){
@@ -219,3 +223,67 @@ void TattileCamera::sig_handler2 (int) // calls the handlers
 cv::Mat** TattileCamera::GetBuffer(){
 	return frame_buffer;
 };
+
+// void TattileCamera::SwitchToFullFrame(){
+// 	std::cout<<"Getting a full frame image!!!"<<std::endl;
+// 	ROI_t ROI_full;// = {IMG_WIDTH, IMG_HEIGHT, 0,0};
+// 	ROI_full.x = 0;
+// 	ROI_full.y = 0;
+// 	ROI_full.width = IMG_WIDTH;
+// 	ROI_full.height = IMG_HEIGHT;
+// 	// packet_full_frame = (uint8_t *)(packet_full_frame);
+// 	cv::Mat full_frame(IMG_HEIGHT, IMG_WIDTH, CV_8UC1, (void *)(packet_full_frame + sizeof(frame_t)), sizeof(uint8_t) * IMG_WIDTH);	
+// 		// cv::Mat full_m(IMG_HEIGHT, IMG_WIDTH, CV_8UC1, (void *)(packet + sizeof(frame_t)), sizeof(uint8_t) * IMG_WIDTH);
+
+// 	sendROI(sock, (struct sockaddr *)&si_server, &ROI_full);
+// 	ret = rx_frame(sock, &si_server, &ROI_full, packet_full_frame);
+// 	std::cout<< "RX_res:  "<<ret<<std::endl;
+// 	// full_frame.convertTo(full_frame,CV_8UC3);
+// 	(full_frame).copyTo(full_frame_);
+// 	cv::imwrite("dbg_full_img2.png", full_frame_);
+
+// 	// sendROI( sock, (struct sockaddr *)&si_server, &(img[write_index].roi));		// Sendign the ROI to the camera
+// 	// ret = rx_frame(sock, &si_server, &(img[write_index].roi), packet);			// Capturing the incomming frame
+// 	// std::cout<< "RX_res:  "<<ret<<std::endl;
+// };
+
+// cv::Mat* TattileCamera::GetFullFrame(){
+// 	std::cout<<"Getting a full frame image!!!"<<std::endl;
+// 	ROI_t ROI_full;// = {IMG_WIDTH, IMG_HEIGHT, 0,0};
+// 	ROI_full.x = 0;
+// 	ROI_full.y = 0;
+// 	ROI_full.width = ROI_WIDTH;
+// 	ROI_full.height = ROI_HEIGHT;
+// 	packet_full_frame = (uint8_t *)(packet_full_frame);
+// 	cv::Mat full_m(IMG_HEIGHT, IMG_WIDTH, CV_8UC1, (void *)(packet + sizeof(frame_t)), sizeof(uint8_t) * IMG_WIDTH);
+
+// 	sendROI(sock, (struct sockaddr *)&si_server, &ROI_full);
+// 	ret = rx_frame(sock, &si_server, &ROI_full, packet_full_frame);
+// 	std::cout<< "RX_res:  "<<ret<<std::endl;
+// 	// full_frame.convertTo(full_frame,CV_8UC3);
+// 	// (full_frame).copyTo(full_frame_);
+// 	// cv::imwrite("dbg_full_img2.png", full_frame);
+
+// 	// sendROI( sock, (struct sockaddr *)&si_server, &(img[write_index].roi));		// Sendign the ROI to the camera
+// 	// ret = rx_frame(sock, &si_server, &(img[write_index].roi), packet);			// Capturing the incomming frame
+// 	// std::cout<< "RX_res:  "<<ret<<std::endl;
+
+
+// 	// cv::Mat full_frame = cv::Mat::zeros(cv::Size(4096, 3072), CV_8UC1);
+// 	// cv::Mat roi_frame(ROI_HEIGHT, ROI_WIDTH, CV_8UC1, (void *)(packet_full_frame + sizeof(frame_t)), sizeof(uint8_t) * IMG_WIDTH);	
+// 	// ROI_t ROI_full;// = {IMG_WIDTH, IMG_HEIGHT, 0,0};
+// 	// ROI_full.x = 0;
+// 	// ROI_full.y = 0;
+// 	// ROI_full.width = ROI_WIDTH;
+// 	// ROI_full.height = ROI_HEIGHT;
+// 	// for (int roi_x = 0; roi_x<(IMG_WIDTH-ROI_WIDTH); roi_x+=152){
+// 	// 	for (int roi_y = 0; roi_y<(IMG_HEIGHT-ROI_HEIGHT); roi_y+=152){
+// 	// 		sendROI(sock, (struct sockaddr *)&si_server, &ROI_full);
+// 	// 		std::cout<<roi_x<<" , "<<roi_y<<std::endl;
+// 	// 		ret = rx_frame(sock, &si_server, &ROI_full, packet_full_frame);
+// 	// 		roi_frame.copyTo(full_frame(cv::Rect(roi_x, roi_y, roi_frame.cols, roi_frame.rows)));
+// 	// 	}
+// 	// } 
+// 	// cv::imwrite("Full.jpg",full_frame);
+// 	return &full_m;
+// };

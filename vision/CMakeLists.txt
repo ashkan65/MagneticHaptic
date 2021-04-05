@@ -20,9 +20,9 @@ add_library(
 	)
 
 add_library(
-	filter
-	filter.cpp
-	filter.hpp
+	Filter
+	Filter.cpp
+	Filter.hpp
 	)
 
 add_executable(ROI_tracking live_ROI.cpp)
@@ -42,6 +42,6 @@ target_link_libraries(ROI_tracking PRIVATE  ${OpenCV_LIBS} m)
 target_link_libraries(Threaded_ROI PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
 target_link_libraries(TattileCamera PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
 target_link_libraries(PoseEstimate PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
-target_link_libraries(filter PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
-target_link_libraries(Tattile_ROI_test PRIVATE  TattileCamera PoseEstimate ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
+target_link_libraries(Filter PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
+target_link_libraries(Tattile_ROI_test PRIVATE  TattileCamera PoseEstimate Filter${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
 target_link_libraries(full_frame PRIVATE ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
