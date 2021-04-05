@@ -60,7 +60,7 @@ Filter::Filter(){
     kf->measurementNoiseCov.at<float>(8) = 1e-20;
 
     // kf->controlMatrix.at<float>(0) = 0.0;// This is B matrix
-
+    RegisterCameras();
 };
 
 Filter::~Filter(){
@@ -201,20 +201,19 @@ void Filter::RegisterCameras(){
     // Reading the camere calibration  
 	////////////////////////////////////////////////////////////////
     cv::Mat cameraMatrixC1, distCoeffsC1, cameraMatrixC2, distCoeffsC2;
-    cv::FileStorage fs2("../calibration_left_camera.xml", cv::FileStorage::READ);
-    fs2["camera_matrix"] >> cameraMatrixC1;
-    fs2["distortion_coefficients"] >> distCoeffsC1;
-    fs2.release();
-
-    cv::FileStorage fs1("../calibration_left_camera.xml", cv::FileStorage::READ);
-    fs1["camera_matrix"] >> cameraMatrixC2;
-    fs1["distortion_coefficients"] >> distCoeffsC2;
+    cv::FileStorage fs1("../calibration/cam_left.yml", cv::FileStorage::READ);
+    fs1["Camera Matrix"] >> cameraMatrixC1;
+    fs1["Dist Coeffs"] >> distCoeffsC1;
     fs1.release();
-    
+
+    cv::FileStorage fs2("../calibration/cam_left.yml", cv::FileStorage::READ);
+    fs2["Camera Matrix"] >> cameraMatrixC2;
+    fs2["Dist Coeffs"] >> distCoeffsC2;
+    fs2.release();
     //Somehow get two full frames -> either imread or full frame mode of the camera
     //If you are using imread, keed the adress in xml file. 
     cv::Mat frame1 = cv::imread("../calibration/left_6.jpg", cv::IMREAD_COLOR);
-    cv::Mat frame2 = cv::imread("../calibration/right_2.jpg", cv::IMREAD_COLOR);
+    cv::Mat frame2 = cv::imread("../calibration/right_6.jpg", cv::IMREAD_COLOR);
     // Detecting the corners of markers
     cv::aruco::detectMarkers(frame1, dictionary, markerCornersC1, markerIdsC1, parameters, rejectedCandidatesC1);
     cv::aruco::detectMarkers(frame2, dictionary, markerCornersC2, markerIdsC2, parameters, rejectedCandidatesC2);
@@ -281,5 +280,6 @@ void Filter::RegisterCameras(){
     cv::estimateAffine3D(matched_points_W1, matched_points_C2, Rt_C12W, inliersC22W); // estimateAffine3D(A,B,T) where B = T.A
     cv::vconcat(Rt_W2C1, L, H_W2C1);
     cv::vconcat(Rt_C12W, L, H_C12W);
+    std::cout<<H_W2C1;
 };
 

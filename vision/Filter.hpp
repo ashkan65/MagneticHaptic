@@ -43,6 +43,7 @@ class Filter{
         ////////////////////////////////////////////////////// 
         cv::Mat Rt_W2C1, Rt_W2C2, Rt_C12W, Rt_C22W;  // Rotation and translation Matrix between W->C1, W->C2, C1->W, C2->W   it's a 3X4 matrix
         cv::Mat H_W2C1, H_W2C2, H_C12W, H_C22W;  // Transformation Matrix between W->C1, W->C2, C1->W, C2->W . Where H = [Rt;0 1]   --> You may or may not need this
+        bool* filter_switch;                        // Kills the filter thread. Turns on and off from outside. 
     public:
         Filter();
         ~Filter();         
@@ -50,6 +51,7 @@ class Filter{
         void CorrectPose(cv::Mat* _pose);                           // Corrects the pose          (GLOBAL)
         void GetROILocation(uint* _ROI_loc, uint _camera_number);   // Gets the location of the next ROI for the requested camera (NOT GLOBAL)
         void ROIPoseCorrection(uint* _pose, uint _camera_number);   // Corrects the state by the pose in the given camera frame (NOT GLOBAL)
-        void RegisterCameras();                                     // Registers cameras in world frame and generates transformation matrixes for both cameras
+        void RegisterCameras();  
+        void Run();                                   // Registers cameras in world frame and generates transformation matrixes for both cameras
 };
 #endif // FILT_H

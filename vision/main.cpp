@@ -15,8 +15,8 @@ std::atomic<short> cam1_available_index (0);
 std::atomic<bool> cam1_NewFrame (false);		// Boolian showing if a new frame is ready for the image processing thread to process
 std::atomic<bool> cam1_NewROI (true);			// Boolian showing if a new ROI location is avaiable -> camera shots a frame
 ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 1600,1200};	// Location of the initial ROI
-std::atomic<cv::Vec3d> RvecsC1, TvecsC1;		// Rotaiton and location vectors of target in camera frame 1
-std::atomic<cv::Vec3d> RvecsC2, TvecsC2;		// Rotaiton and location vectors of target in camera frame 2
+// std::atomic<cv::Vec3d> RvecsC1, TvecsC1;		// Rotaiton and location vectors of target in camera frame 1
+// std::atomic<cv::Vec3d> RvecsC2, TvecsC2;		// Rotaiton and location vectors of target in camera frame 2
 
 
 
@@ -42,6 +42,7 @@ int main() {
 	// std::cout<<AA<<std::endl;
 	PoseEstimate Pose1;
 	TattileCamera Cam1;
+	Filter filter;
 	Cam1.SetupIPAddress("192.168.1.6");
 	Cam1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &ROI);
 	std::cout<<"HERE-----------------------------------"<<std::endl;

@@ -43,5 +43,5 @@ target_link_libraries(Threaded_ROI PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_I
 target_link_libraries(TattileCamera PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
 target_link_libraries(PoseEstimate PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
 target_link_libraries(Filter PRIVATE  ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
-target_link_libraries(Tattile_ROI_test PRIVATE  TattileCamera PoseEstimate Filter${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
+target_link_libraries(Tattile_ROI_test PRIVATE  TattileCamera PoseEstimate Filter ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
 target_link_libraries(full_frame PRIVATE ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} m)
