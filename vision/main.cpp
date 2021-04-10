@@ -14,7 +14,7 @@ ROI_t cam1_roi;
 std::atomic<short> cam1_available_index (0);
 std::atomic<bool> cam1_NewFrame (false);		// Boolian showing if a new frame is ready for the image processing thread to process
 std::atomic<bool> cam1_NewROI (true);			// Boolian showing if a new ROI location is avaiable -> camera shots a frame
-ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 1600,1200};	// Location of the initial ROI
+ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 1648,976};	// Location of the initial ROI
 // std::atomic<cv::Vec3d> RvecsC1, TvecsC1;		// Rotaiton and location vectors of target in camera frame 1
 // std::atomic<cv::Vec3d> RvecsC2, TvecsC2;		// Rotaiton and location vectors of target in camera frame 2
 
@@ -56,10 +56,16 @@ int main() {
 // 	}
 	Pose1.SetCameraCalibration("../calibration/cam_left.yml");
 	Pose1.SetBuffer(Cam1.GetBuffer());
-	Pose1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &cam1_NewROI, &(ROI.x), &(ROI.y));	
+	Pose1.SetConnections(&cam1_NewFrame, &cam1_available_index , &cam1_switch, &(ROI.x), &(ROI.y));	
+	filter.SetConnection(&cam1_switch, Pose1.GetNewPose_P(), Pose1.GetNewPose_P(), &cam1_NewROI, &(ROI.x), &(ROI.y));
+	filter.SetTargetsAddress(Pose1.GetTargetLoc_P(), Pose1.GetTargetRot_P(), Pose1.GetTargetLoc_P(), Pose1.GetTargetRot_P());
+	
 	std::thread thread1(std::mem_fn(&TattileCamera::Run), &Cam1);
 	std::thread thread2(std::mem_fn(&PoseEstimate::Run), &Pose1);
+	std::thread thread3(std::mem_fn(&Filter::Run), &filter);
+	
 	thread1.join();	
 	thread2.join();	
+	thread3.join();	
 	return 0;
 }

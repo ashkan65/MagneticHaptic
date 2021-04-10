@@ -4,7 +4,18 @@ Filter::Filter(){
     kf =  new cv::KalmanFilter(stateSize, measSize, contrSize, type);
     state = new cv::Mat(stateSize, 1, type);  // [x,y,z,v_x,v_y,v_z,a_x,a_y,a_z]
     meas  = new cv::Mat(measSize, 1, type);    // [z_x,z_y,z_z]
-	////////////////////////////////////////////////////////////////
+	pose_vec_W.push_back(cv::Vec3d(0.0, 0.0, 0.0));
+    // estimate = new cv::Mat(stateSize, 1, type); // [x,y,z,v_x,v_y,v_z,a_x,a_y,a_z]
+    (*state).at<float>(0,0)= 1.0;
+    (*state).at<float>(1,0)= 1.0;
+    (*state).at<float>(2,0)= 1.0;
+    (*state).at<float>(3,0)= 1.0;
+    (*state).at<float>(4,0)= 1.0;
+    (*state).at<float>(5,0)= 1.0;
+    (*state).at<float>(6,0)= 1.0;
+    (*state).at<float>(7,0)= 1.0;
+    (*state).at<float>(8,0)= 1.0;
+    ////////////////////////////////////////////////////////////////
 	// Setting up the filter:
 	///////////////////////////////////////////////////////////////
     // Transition State Matrix A
@@ -83,14 +94,10 @@ void Filter::CorrectPose(cv::Mat* _pose){
         kf->transitionMatrix.at<float>(6)  = 0.5*dT*dT;
         kf->transitionMatrix.at<float>(16) = 0.5*dT*dT;
         kf->transitionMatrix.at<float>(26) = 0.5*dT*dT;
-
-                
-            //     // <<<< Matrix A
-
-            //     cout << "dT:" << endl << dT << endl;
-
         *state = kf->predict();
     }
+    // std::cout<<"DT: "<< dT <<std::endl;
+
 	// meas.at<float>(0) = (*_pose)(0);
 	// meas.at<float>(1) = (*_pose)(1);
 	// meas.at<float>(2) = 0;
@@ -123,7 +130,6 @@ void Filter::CorrectPose(cv::Mat* _pose){
 	else
 	    kf->correct(*_pose); // Kalman Correction
 };
-
 
 void Filter::GetPose(cv::Mat* _pose){
     // @TDDO: Change this to crono type
@@ -200,7 +206,6 @@ void Filter::RegisterCameras(){
 	////////////////////////////////////////////////////////////////
     // Reading the camere calibration  
 	////////////////////////////////////////////////////////////////
-    cv::Mat cameraMatrixC1, distCoeffsC1, cameraMatrixC2, distCoeffsC2;
     cv::FileStorage fs1("../calibration/cam_left.yml", cv::FileStorage::READ);
     fs1["Camera Matrix"] >> cameraMatrixC1;
     fs1["Dist Coeffs"] >> distCoeffsC1;
@@ -280,6 +285,95 @@ void Filter::RegisterCameras(){
     cv::estimateAffine3D(matched_points_W1, matched_points_C2, Rt_C12W, inliersC22W); // estimateAffine3D(A,B,T) where B = T.A
     cv::vconcat(Rt_W2C1, L, H_W2C1);
     cv::vconcat(Rt_C12W, L, H_C12W);
-    std::cout<<H_W2C1;
+};
+
+void Filter::SetTargetsAddress(std::vector<cv::Vec3d>* _cam1T, std::vector<cv::Vec3d>* _cam1R, std::vector<cv::Vec3d>* _cam2T, std::vector<cv::Vec3d>* _cam2R){
+    cam1T = _cam1T;
+    cam1R = _cam1R;
+    cam2T = _cam2T;
+    cam2R = _cam2R;  
+}
+
+void Filter::Run(){
+    // std::cout<<"GOT HERE"<< *filter_switch<<std::endl;
+    cv::Mat rvec = cv::Mat::zeros(3,1,CV_32F);
+    cv::Mat tvec = cv::Mat::zeros(3,1,CV_32F);
+    std::vector<cv::Point2f> target_location_image1, target_location_image2;
+    std::vector<cv::Vec3f>  cam1loc_f;
+    cv:: Mat rotatMat = (cv::Mat_<double>(3,3) << 1, 0, 0, 0, 1, 0,0, 0, 1 );
+    cv::Mat rotatVec;
+    cv::Rodrigues(rotatMat, rotatVec);
+    while (*filter_switch){
+        if (*new_pose_cam1 != NULL){
+            if (*new_pose_cam1){
+                //update the pose via cam1 measurement 
+                /*
+                1- Transfer (cam1T&cam1R) Cam1->w
+                2- Update the state via new pose :Kal.CorrectPose(&st);               
+                3- Get a new estimate from the pose: Kal.GetPose(&est)
+                4- Transfer (cam1T&cam1R) W->Cam1
+                5- Project calculate the roi_loc
+                */
+                //   1- Transfer (cam1T&cam1R) Cam1->w
+                cv::perspectiveTransform (*cam1T, pose_Vec_C, H_C12W); //pres(B,A,T) where A = T.B
+                //  2- Update the state via new pose :Kal.CorrectPose(&st);
+                (*meas).at<float>(0,0) = pose_Vec_C[0][0];      // x
+                (*meas).at<float>(1,0) = pose_Vec_C[0][1];      // y
+                (*meas).at<float>(2,0) = pose_Vec_C[0][2];      // z
+                // std::cout<<"Measure"<<*meas<<std::endl;
+                CorrectPose(meas);           
+                (*new_pose_cam1).store(false);
+
+                // 3- Get a new estimate from the pose: Kal.GetPose(&est)
+                if (found){
+                    GetPose(state);
+                    // std::cout <<"EST:"<< *state<<std::endl;
+                }
+                // 4- Transfer (cam1T&cam1R) W->Cam1
+                pose_Vec_C[0][0] = (double)(*state).at<float>(0,0);
+                pose_Vec_C[0][1] = (double)(*state).at<float>(1,0);
+                pose_Vec_C[0][2] = (double)(*state).at<float>(2,0);
+                // std::cout<<"here2"<<std::endl;
+                cv::perspectiveTransform (pose_Vec_C, cam1loc, H_W2C1);
+                // std::cout<<"here3"<<std::endl;
+                cam1loc_f.push_back(cv::Vec3f((float)cam1loc[0][0], (float)cam1loc[0][1], (float)cam1loc[0][2]));
+                // cam1loc_f[0][0] = (float)cam1loc[0][0];
+                // cam1loc_f[0][1] = (float)cam1loc[0][1];
+                // cam1loc_f[0][2] = (float)cam1loc[0][2];
+                
+                // std::cout<<"here4"<<std::endl;
+
+                cv::projectPoints(cam1loc_f, rotatVec, tvec,cameraMatrixC1, distCoeffsC1, target_location_image1);	
+                // std::cout<< target_location_image1[0]<<std::endl;
+                uint u = (uint)(target_location_image1[0].x - 72.0);
+                uint v = (uint)(target_location_image1[0].y - 72.0);
+                u -=u % 16;
+                v -=v % 16;
+                std::cout<<"U :"<<u<<"  V :"<<v<<std::endl;
+                *ROI_C1_x = u;
+                *ROI_C1_y = v;
+                cam1loc_f.pop_back();
+            }
+        }
+        // if (*new_pose_cam2){
+        //     //update the pose via cam1 measurement
+        //     std::cout<<"cam2T:"<<*cam2T<<std::endl;
+        //     std::cout<<"cam2R:"<<*cam2R<<std::endl;
+        //     (*new_pose_cam2).store(false);
+        // }
+        // if (!*new_ROI_location){
+        //     *new_ROI_location = true;
+        // }
+    }
+};
+
+void Filter::SetConnection(bool* _filter_switch, std::atomic<bool>* _new_pose_cam1, std::atomic<bool>* _new_pose_cam2, std::atomic<bool>* _new_ROI_location, uint16_t* _ROI_x,uint16_t* _ROI_y){
+    filter_switch = _filter_switch;
+    new_pose_cam1 = _new_pose_cam1;
+    new_pose_cam2 = _new_pose_cam2;  
+    new_ROI_location = _new_ROI_location;
+    ROI_C1_x = _ROI_x;
+    ROI_C1_y = _ROI_y;
+    
 };
 
