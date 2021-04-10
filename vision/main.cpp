@@ -14,7 +14,7 @@ ROI_t cam1_roi;
 std::atomic<short> cam1_available_index (0);
 std::atomic<bool> cam1_NewFrame (false);		// Boolian showing if a new frame is ready for the image processing thread to process
 std::atomic<bool> cam1_NewROI (true);			// Boolian showing if a new ROI location is avaiable -> camera shots a frame
-ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 1648,976};	// Location of the initial ROI
+ROI_t ROI = {ROI_WIDTH,ROI_HEIGHT, 2176,1616};	// Location of the initial ROI
 // std::atomic<cv::Vec3d> RvecsC1, TvecsC1;		// Rotaiton and location vectors of target in camera frame 1
 // std::atomic<cv::Vec3d> RvecsC2, TvecsC2;		// Rotaiton and location vectors of target in camera frame 2
 
@@ -63,7 +63,9 @@ int main() {
 	std::thread thread1(std::mem_fn(&TattileCamera::Run), &Cam1);
 	std::thread thread2(std::mem_fn(&PoseEstimate::Run), &Pose1);
 	std::thread thread3(std::mem_fn(&Filter::Run), &filter);
-	
+	int a;
+	std::cin>>a;
+	cam1_switch = false;
 	thread1.join();	
 	thread2.join();	
 	thread3.join();	

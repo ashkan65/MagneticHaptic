@@ -325,10 +325,12 @@ void Filter::Run(){
                 (*new_pose_cam1).store(false);
 
                 // 3- Get a new estimate from the pose: Kal.GetPose(&est)
-                if (found){
-                    GetPose(state);
+            }
+        }
+        if (found){
+                GetPose(state);
                     // std::cout <<"EST:"<< *state<<std::endl;
-                }
+                
                 // 4- Transfer (cam1T&cam1R) W->Cam1
                 pose_Vec_C[0][0] = (double)(*state).at<float>(0,0);
                 pose_Vec_C[0][1] = (double)(*state).at<float>(1,0);
@@ -349,12 +351,11 @@ void Filter::Run(){
                 uint v = (uint)(target_location_image1[0].y - 72.0);
                 u -=u % 16;
                 v -=v % 16;
-                std::cout<<"U :"<<u<<"  V :"<<v<<std::endl;
+                // std::cout<<"U :"<<u<<"  V :"<<v<<std::endl;
                 *ROI_C1_x = u;
                 *ROI_C1_y = v;
                 cam1loc_f.pop_back();
-            }
-        }
+         }
         // if (*new_pose_cam2){
         //     //update the pose via cam1 measurement
         //     std::cout<<"cam2T:"<<*cam2T<<std::endl;
