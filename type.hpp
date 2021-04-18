@@ -12,14 +12,15 @@
 #include <Eigen/QR> 
 #define PI   3.1415926535
 #define PI_2 1.570796327
+
 typedef double current;
 typedef double voltage;
 typedef double temperature;
-typedef Eigen::Matrix<double, 5, 1> vec_wrench;
-typedef Eigen::Matrix<current, 8, 1> vec_current;
-typedef Eigen::Matrix<voltage, 8, 1> vec_voltage;
-typedef Eigen::Matrix<temperature, 16, 1> vec_temp_C; //Two sensors per coil ^\circ {C}
-typedef Eigen::Matrix<double, 5, 8> Mat_actuation; // 
+typedef Eigen::VectorXd vec_wrench;
+typedef Eigen::VectorXd vec_current;
+typedef Eigen::VectorXd vec_voltage;
+typedef Eigen::VectorXd vec_temp_C; //Two sensors per coil ^\circ {C}
+typedef Eigen::MatrixXd Mat_actuation; // 
 
 
 
