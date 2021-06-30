@@ -43,7 +43,6 @@ void GPIO826::SysOff()
 void GPIO826::SetCoilsCurrent(vec_current * coilcurrent)
 {	
 	Current2Volt(coilcurrent);
-	std::cout << "been here3" << std::endl;
   	AnalogWrite(&_TempVolt);
 };
 
@@ -56,7 +55,6 @@ void GPIO826::GetCoilsCurrent(vec_current * coilcurrent)
 {
 	vec_voltage localVoltage(8,1);
 	GetCoilsVoltage(localVoltage);
-	std::cout<<"Local Volatage:"<<localVoltage<<std::endl;
 	Volt2Current(&localVoltage, coilcurrent);
 };
 
