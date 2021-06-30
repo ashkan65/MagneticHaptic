@@ -99,3 +99,14 @@ void Simple826::SetDioOutput(uint *chan, bool *val){        //chan->channel numb
     uint mask[] = {uint(pow(2,*chan)), 0};
     *val ? S826_DioOutputWrite(0, mask, 2) : S826_DioOutputWrite(0, mask, 1);
 };   
+
+void Simple826::ReadAdcOutput(int* adcbuf, double *data){ // Abalog input read for every channel from 1 to 16
+    errcode = S826_AdcRead(board, adcbuf, NULL, &slotlist, 1000) ; // read adc data from 16 slots
+        // Converting buffer value to voltage in each slot (data*10volt/2^8) setting: -10V to 10V, -2^8 to 2^8 bits : 
+        for (int slot = 0; slot < 16; slot++){ 
+            data[slot] = (short)( adcbuf[slot] & 0xFFFF );
+            data[slot] = (double)(data[slot]*10)/(32768);
+        };     
+
+
+  }
