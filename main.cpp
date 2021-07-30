@@ -32,22 +32,22 @@ int main()
 	vec_temp_C temps(8,1);
 	temps<< 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 155.0 ;
 	ex_C.PINV(WR,  A, I);
-	std::cout<<"PINV I : "<<I<<"----------------"<<std::endl;
+	//std::cout<<"PINV I : "<<I<<"----------------"<<std::endl;
 	
-	std::cout<<"PINV OUT: "<<A* I<<"----------------"<<std::endl;
+	// std::cout<<"PINV OUT: "<<A* I<<"----------------"<<std::endl;
 	
 	ex_C.RPINV(WR,  A, I);
 
-	std::cout<<"RPINV I: "<<I<<"----------------"<<std::endl;
+	// std::cout<<"RPINV I: "<<I<<"----------------"<<std::endl;
 
-	std::cout<<"RPINV OUT: "<<A* I<<"----------------"<<std::endl;
+	// std::cout<<"RPINV OUT: "<<A* I<<"----------------"<<std::endl;
 
 
 	ex_C.RWPINV(WR,  A, temps , I);
 
-	std::cout<<"RWPINV I: "<<I<<"----------------"<<std::endl;
+	// std::cout<<"RWPINV I: "<<I<<"----------------"<<std::endl;
 
-	std::cout<<"RWPINV OUT: "<<A* I<<"----------------"<<std::endl;
+	// std::cout<<"RWPINV OUT: "<<A* I<<"----------------"<<std::endl;
 
 /////////////////////////////////////////////
 	double volt = -6.32;
@@ -59,54 +59,74 @@ int main()
 	// B826.GetDacOutput(&channel, &volt2);
 	
 
+
+	Card1.Init();
 	vec_voltage voltage(8,1); 
 	vec_voltage output_voltage(8,1);
 	vec_current current(8,1);
 	vec_current output_current(8,1);
 	vec_voltage input_volt(16,1);
 	vec_temp_C temperature(16,1);
+	vec_voltage offset (8,1);
+	offset << 0.008812, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0; // Amplifier offset
+	Card1.SetOffset(&offset);
+	
+	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Testing AMC Amplifiers 7.21.21
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	current << 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-	// voltage << 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8;
-	current << 1.1, 2.2, 3.3, 4.4, 5.5, 3.0, 7.7, 8.8;
-// std::cout << "Here is the matrix a:\n" << a[0] << std::endl;
+	voltage << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+
+	// Output the appropriate signal from the DAC
+	// Card1.AnalogWrite(&voltage);
 
 	Card1.SetCoilsCurrent(&current);
 
-	// std::cout << "been here---" << std::endl;
 
-	Card1.GetDacOutput(&channel, &volt2);
-	// std::cout<<"This is voltage for 3A: "<<volt2<<std::endl;
-	Card1.AnalogWrite(&voltage);
+	// Tell the user the "current" signals sent to the DAC
+	//Card1.GetCoilsCurrent(&current);
+	//std::cout << "This is the commanded current:\n" << current << std::endl;
+
+	// Tell the user the voltage signals sent to the DAC
+	// Card1.GetCoilsVoltage(&voltage);
+	// std::cout << "This is the commanded voltage:\n" << voltage << std::endl;
+
+	int a;
+	std::cin>>a;
+	
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	Card1.PrintError(); 
-	Card1.GetDacOutput(&channel, &volt2);
-	// std::cout<<"Check this:     "<<volt2<<std::endl;
-	current << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-// std::cout << "Here is the matrix a:\n" << a[0] << std::endl;
+	// Card1.GetDacOutput(&channel, &volt2);
 
-	// Card1.AnalogWrite(&voltage);
+
 	// B826.SetDacOutput(&channel, &volt);
-	Card1.PrintError(); 
+	
 	// Card1.GetDacOutput(&channel, &volt2);
 
 	// Card1.GetCoilsVoltage(&output_voltage);
 
-	// std::cout<<"Check this:     "<<output_voltage<<std::endl;
-	// std::cout<<"Check this123:     "<<output_current<<std::endl;
+	// Card1.GetCoilsCurrent(&output_current);
 
-	Card1.GetCoilsCurrent(&output_current);
-
-	// std::cout<<"Check this:     "<<output_current<<std::endl;
 	//Card1.AnalogRead();
-	Card1.AnalogRead(&input_volt);
+	// Card1.AnalogRead(&input_volt);
 
-	Card1.GetCoilsTemperature(&temperature);
-	// std::cout << "Temperature: " << temperature << std::endl;
+	// Card1.GetCoilsTemperature(&temperature);
 
 	// uint dios[] = {         // Specify DIOs that are to be turned on:
 	// 	(1 << 7) + (1 << 13), //   DIOs 7 & 13 are in first 24-bit mask (DIOs 0-23),
 	// 	(1 << (38 - 24))      //   DIO 38 is in second 24-bit mask (DIOs 24-47).
 	// };
 	// std::cout<<dios[0]<<std::endl;
+	Card1.SysOff();
     return 0;
 }
 

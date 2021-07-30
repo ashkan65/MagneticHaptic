@@ -7,15 +7,20 @@
 
 void GPIO826::Init()
 {
-	*_PCoilVolts<< 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-	AnalogWrite(_PCoilVolts);	// Turns the signal channels off --> be sure there is not HIGHVOLT output
+	
+	vec_voltage _0Volts(8,1);
+	_0Volts << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+	
+	AnalogWrite(&_0Volts);	// Turns the signal channels off --> be sure there is not HIGHVOLT output
 	// bool val = true;
 	// for(int i = 0; i < NUMCOILS; i++) {
 	// 	SetDioOutput(&COIL_INHIBIT_MAP[i], &val);	//Turns the amplifiers on--> Be sure the signals are zero before turning these on.	
 	// }
+
 	SysOn();
 	PrintError();
 };
+
 void GPIO826::AnalogWrite(vec_voltage * coilvolts)
 {
     _PCoilVolts = coilvolts;
@@ -28,7 +33,7 @@ void GPIO826::SysOn()
 {
 	
 	for(int i = 0; i < NUMCOILS; i++) {
-		SetDioOutput(&COIL_OUT_MAP[i] , &ON);
+		SetDioOutput(&COIL_INHIBIT_MAP[i] , &ON);
 	}
 };
 
@@ -36,7 +41,7 @@ void GPIO826::SysOff()
 {
 	
 	for(int i = 0; i < NUMCOILS; i++) {
-		SetDioOutput(&COIL_OUT_MAP[i] , &OFF);
+		SetDioOutput(&COIL_INHIBIT_MAP[i] , &OFF);
 	}
 };
 
@@ -48,7 +53,7 @@ void GPIO826::SetCoilsCurrent(vec_current * coilcurrent)
 
 void GPIO826::Current2Volt(vec_current * _coilcurrent)
 {
-	_TempVolt = (*_coilcurrent)*(1.0/3.0);	//	@TODO: This 1/3 needs to be adjusted
+	_TempVolt = (*_coilcurrent)*(1.0/4.1035) + (*_offset);	//	@TODO: This 1/3 needs to be adjusted
 };
 
 void GPIO826::GetCoilsCurrent(vec_current * coilcurrent)
@@ -68,7 +73,7 @@ void GPIO826::GetCoilsVoltage(vec_voltage & coilvolts)
 
 void GPIO826::Volt2Current(vec_voltage * _coilvoltage, vec_current * _P_TempCurrent)
 {
-	(*_P_TempCurrent) = (*_coilvoltage)*(3.0);	//	@TODO: This 3 needs to be adjusted
+	(*_P_TempCurrent) = (*_coilvoltage)*(4.1697);	//	@TODO: This 3 needs to be adjusted
 };
 
 
@@ -89,3 +94,8 @@ void GPIO826::GetCoilsTemperature(vec_temp_C * _temperature)
 		(*_temperature)(i) = a*pow(data[i],4) + b*pow(data[i],3) + c*pow(data[i],2) + d*data[i] + e;
 	}	
 };	
+
+void GPIO826::SetOffset(vec_voltage * offset)
+{
+	_offset = offset;
+};

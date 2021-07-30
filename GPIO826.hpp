@@ -26,9 +26,9 @@ class GPIO826: public Simple826 {
 		vec_temp_C * _PCoilTemperatures;		//Temps VECTOR measured from coils
 		vec_voltage * _P_TempVolt;				// Pointer to voltage vector for book keeping in SetCoilsCurrent.
 		vec_voltage _TempVolt;
-		vec_current _TempCurrent;			// Pointer to Current vector for book keeping in SetCoilsCurrent.
-		vec_voltage _thermocouple_volt; 					// voltage vector for thermocouple
-
+		vec_current _TempCurrent;				// Pointer to Current vector for book keeping in SetCoilsCurrent.
+		vec_voltage _thermocouple_volt; 		// voltage vector for thermocouple
+		vec_voltage * _offset; 					// Amplifier offset
 
 		bool ON = true;
 		bool OFF = false;
@@ -63,7 +63,7 @@ class GPIO826: public Simple826 {
 		void GetCoilsVoltage(vec_voltage & coilvolts);
 		void SetCoilsCurrent(vec_current * coilcurrent);
 		void SetCoilsVoltage();
-
+		void SetOffset(vec_voltage * offset);
 		void Current2Volt(vec_current * coilcurrent);	// Converts the current to voltage and saves it on _TempVolt!!!!
 		void Volt2Current(vec_voltage * _coilvoltage, vec_current * coilcurrent);
 		void AnalogWrite(vec_voltage * coilvolts);	//Sends the vectors of Currents to the device (This turns the coils on)

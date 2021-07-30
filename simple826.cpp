@@ -26,7 +26,7 @@ Simple826::Simple826(){
 
     // S826_DacRangeWrite(0, 0, S826_DAC_SPAN_10_10, 1);
     for (uint aout = 0; aout < S826_NUM_DAC; aout++) {         // Program safemode analog output condition:
-        S826_DacRangeWrite(0, aout, S826_DAC_SPAN_10_10, 1);  //   output range
+        S826_DacRangeWrite(0, aout, S826_DAC_SPAN_10_10, 0);  //   output range
         S826_DacDataWrite(0, aout, 0, 0);                   //   output voltage
     }
     PrintError();
@@ -81,7 +81,10 @@ void Simple826::PrintError(){ //return error code
 // AnalogWrite. 
 
 void Simple826::SetDacOutput(uint *chan, double *volts){ // DAC for one channel ----> DOTO add a function for vector update!
+    // std::cout<<"Check this guy: "<< *volts<<std::endl;
     errcode = S826_DacDataWrite(board, *chan, (int)(*volts * 0xFFFF / 20) + 0x8000, 0);  // program DAC output and return error code
+    // errcode = S826_DacDataWrite(board, *chan, 0xFFFF, 0);  // program DAC output and return error code
+
 };
 
 void Simple826::GetDacOutput(uint *chan, double *volts){   //Reads the current voltage for a given channel.
