@@ -1,7 +1,7 @@
 #ifndef GPIO826_H
 #define GPIO826_H
 /*****************************************************
-GPIO (Sensoray 826 interface for Mahnetic haptic device)
+GPIO (Sensoray 826 interface for Magnetic haptic device)
 This class Inherents from simple826 class (git: https://github.com/ashkan65/SensorayWrapper)
  
 Ver 1.0 by Ashkan Oct-2020		
@@ -29,6 +29,7 @@ class GPIO826: public Simple826 {
 		vec_current _TempCurrent;				// Pointer to Current vector for book keeping in SetCoilsCurrent.
 		vec_voltage _thermocouple_volt; 		// voltage vector for thermocouple
 		vec_voltage * _offset; 					// Amplifier offset
+		vec_voltage * _scale; 					// Amplifier scale
 
 		bool ON = true;
 		bool OFF = false;
@@ -64,6 +65,7 @@ class GPIO826: public Simple826 {
 		void SetCoilsCurrent(vec_current * coilcurrent);
 		void SetCoilsVoltage();
 		void SetOffset(vec_voltage * offset);
+		void SetScale(vec_voltage * scale);
 		void Current2Volt(vec_current * coilcurrent);	// Converts the current to voltage and saves it on _TempVolt!!!!
 		void Volt2Current(vec_voltage * _coilvoltage, vec_current * coilcurrent);
 		void AnalogWrite(vec_voltage * coilvolts);	//Sends the vectors of Currents to the device (This turns the coils on)

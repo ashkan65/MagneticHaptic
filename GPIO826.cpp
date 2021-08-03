@@ -48,12 +48,18 @@ void GPIO826::SysOff()
 void GPIO826::SetCoilsCurrent(vec_current * coilcurrent)
 {	
 	Current2Volt(coilcurrent);
+	std::cout << _TempVolt << std::endl;
   	AnalogWrite(&_TempVolt);
 };
 
 void GPIO826::Current2Volt(vec_current * _coilcurrent)
 {
-	_TempVolt = (*_coilcurrent)*(1.0/4.1035) + (*_offset);	//	@TODO: This 1/3 needs to be adjusted
+	// _TempVolt = (*_coilcurrent)*(*_scale) + (*_offset);	//	@TODO: This 1/3 needs to be adjusted
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Want element-wise multiplication of current and scale
+	_TempVolt = (*_coilcurrent).cwiseProduct((*_scale)) + (*_offset);	//	@TODO: This 1/3 needs to be adjusted
+	///////////////////////////////////////////////////////////////////////////////////////////////
 };
 
 void GPIO826::GetCoilsCurrent(vec_current * coilcurrent)
@@ -98,4 +104,9 @@ void GPIO826::GetCoilsTemperature(vec_temp_C * _temperature)
 void GPIO826::SetOffset(vec_voltage * offset)
 {
 	_offset = offset;
+};
+
+void GPIO826::SetScale(vec_voltage * scale)
+{
+	_scale = scale;
 };

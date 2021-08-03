@@ -68,8 +68,11 @@ int main()
 	vec_voltage input_volt(16,1);
 	vec_temp_C temperature(16,1);
 	vec_voltage offset (8,1);
-	offset << 0.008812, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0; // Amplifier offset
+	vec_voltage scale (8,1);
+	offset << 0.008812, 0.023295, 0.006153, 0.003136, 0.042715, 0.032049, 0.017191, 0.021024; 	// Amplifier offset
+	scale << 0.2437, 0.3872, 0.3584, 0.3402, 0.3656, 0.2989, 0.3557, 0.3788; 					// Amplifier scale 
 	Card1.SetOffset(&offset);
+	Card1.SetScale(&scale);
 	
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,14 +81,14 @@ int main()
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	current << 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+	current << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-	voltage << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+	voltage << 0.0, 0.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0;
 
 	// Output the appropriate signal from the DAC
-	// Card1.AnalogWrite(&voltage);
+	Card1.AnalogWrite(&voltage);
 
-	Card1.SetCoilsCurrent(&current);
+	// Card1.SetCoilsCurrent(&current);
 
 
 	// Tell the user the "current" signals sent to the DAC
