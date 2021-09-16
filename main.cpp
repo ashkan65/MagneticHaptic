@@ -69,8 +69,8 @@ int main()
 	vec_temp_C temperature(16,1);
 	vec_voltage offset (8,1);
 	vec_voltage scale (8,1);
-	offset << 0.008812, 0.023295, 0.006153, 0.003136, 0.042715, 0.032049, 0.017191, 0.021024; 	// Amplifier offset
-	scale << 0.2437, 0.3872, 0.3584, 0.3402, 0.3656, 0.2989, 0.3557, 0.3788; 					// Amplifier scale 
+	offset << 0.008812, 0.023295, 0.006153, -0.014536, 0.042715, 0.032049, 0.017191, 0.021024; 	// Amplifier offset
+	scale << 0.2437, 0.3872, 0.3584, 0.2427, 0.3656, 0.2989, 0.3557, 0.3788; 					// Amplifier scale 
 	Card1.SetOffset(&offset);
 	Card1.SetScale(&scale);
 	
@@ -81,14 +81,14 @@ int main()
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	current << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+	// current << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-	voltage << 0.0, 0.0, 0.0, -0.5, 0.0, 0.0, 0.0, 0.0;
+	voltage << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
 	// Output the appropriate signal from the DAC
 	Card1.AnalogWrite(&voltage);
 
-	// Card1.SetCoilsCurrent(&current);
+	//Card1.SetCoilsCurrent(&current);
 
 
 	// Tell the user the "current" signals sent to the DAC
@@ -99,8 +99,8 @@ int main()
 	// Card1.GetCoilsVoltage(&voltage);
 	// std::cout << "This is the commanded voltage:\n" << voltage << std::endl;
 
-	int a;
-	std::cin>>a;
+	// int a;
+	// std::cin>>a;
 	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,10 @@ int main()
 	//Card1.AnalogRead();
 	// Card1.AnalogRead(&input_volt);
 
-	// Card1.GetCoilsTemperature(&temperature);
+	Card1.AnalogRead(&input_volt);
+
+	int a;
+	std::cin>>a;
 
 	// uint dios[] = {         // Specify DIOs that are to be turned on:
 	// 	(1 << 7) + (1 << 13), //   DIOs 7 & 13 are in first 24-bit mask (DIOs 0-23),

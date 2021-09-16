@@ -9,7 +9,7 @@ Ver 1.0 by Ashkan Oct-2020
 #include <chrono>
 #include <iostream>
 #include "826api.h"
-#include "simple826.hpp" //Parent class fot this class 
+#include "simple826.hpp" //Parent class for this class 
 #include "type.hpp"
 // #include <thread>  //Might be better to do the threading outside!
 
@@ -17,7 +17,7 @@ Ver 1.0 by Ashkan Oct-2020
 class GPIO826: public Simple826 {
 	private:
 		///////////////////////////////////////////// 
-		// There are eight coils attached to the card (coil 0-7)->DAOut(vetor<8>), also there are two thermolcoples per coil (channels 0-15)->ADin(vector<16>)
+		// There are eight coils attached to the card (coil 0-7)->DAOut(vetor<8>), also there are two thermocouples per coil (channels 0-15)->ADin(vector<16>)
 		bool status;
 		const int  NUMCOILS = 8;						// How many coils we have!
 
@@ -34,13 +34,13 @@ class GPIO826: public Simple826 {
 		bool ON = true;
 		bool OFF = false;
 		uint COIL_INHIBIT_MAP[8] = {0,1,2,3,4,5,6,7};	//Channel number for inhibit for Amplifiers		
-		uint COIL_OUT_MAP[8] = {0,1,2,3,4,5,6,7};		//  List of controll pins per coils : 0,1,2,3,4,5,6,7;	//The pin number with the correct order
+		uint COIL_OUT_MAP[8] = {0,1,2,3,4,5,6,7};		//  List of control pins per coils : 0,1,2,3,4,5,6,7;	//The pin number with the correct order
  		uint  COIL_TEMP_MAP_A[8] = {0,2,4,6,8,10,12,14};//  List of Temp pins per coils; Channel A 
 		uint  COIL_TEMP_MAP_B[8] = {1,3,5,7,9,11,13,15};//  List of Temp pins per coils; Channel B
 		int adcbuf[16]; // Pointer to a buffer that will receive ADC results for the sixteen possible slots. The buffer must be large enough to
         //accommodate sixteen values regardless of the number of active slots. Each slot is represented by a 32-bit value,
         //which is stored at buf[SlotNumber].
-		double data[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0, 0.0}; // data for each channel/slot
+		double data[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // data for each channel/slot
 
 		// @TODO: Change these thermocouple calibration constants
 		double a = 1.0;
@@ -53,9 +53,9 @@ class GPIO826: public Simple826 {
 	public:
 		void SetProp(); 										//TODO
 		void Init();											//TODO
-		void SysOn();											//Turns the inhebits on 
-		void SysOff();											//Turns the inhebits off
-		void AnalogRead(vec_voltage * _voltage);				// Reads analog inputes from Sensoray card
+		void SysOn();											//Turns the inhibits on 
+		void SysOff();											//Turns the inhibits off
+		void AnalogRead(vec_voltage * _voltage);				// Reads analog inputs from Sensoray card
 		void GetCoilsTemperature(vec_temp_C * _temperature);	// Reads the temperature of the coils
 		
 		// These should be somewhere else:
